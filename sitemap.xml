@@ -2,56 +2,62 @@
 <ns0:urlset xmlns:ns0="http://www.sitemaps.org/schemas/sitemap/0.9">
   <ns0:url>
     <ns0:loc>https://das-rebel.github.io/a3m-router/</ns0:loc>
-    <ns0:lastmod>2026-05-31</ns0:lastmod>
+    <ns0:lastmod>2026-07-25</ns0:lastmod>
     <ns0:changefreq>weekly</ns0:changefreq>
     <ns0:priority>1.0</ns0:priority>
   </ns0:url>
   <ns0:url>
     <ns0:loc>https://das-rebel.github.io/a3m-router/quick-start</ns0:loc>
-    <ns0:lastmod>2026-05-31</ns0:lastmod>
+    <ns0:lastmod>2026-07-25</ns0:lastmod>
     <ns0:changefreq>weekly</ns0:changefreq>
     <ns0:priority>0.9</ns0:priority>
   </ns0:url>
   <ns0:url>
     <ns0:loc>https://das-rebel.github.io/a3m-router/benchmark</ns0:loc>
-    <ns0:lastmod>2026-05-31</ns0:lastmod>
+    <ns0:lastmod>2026-07-25</ns0:lastmod>
     <ns0:changefreq>weekly</ns0:changefreq>
     <ns0:priority>0.9</ns0:priority>
   </ns0:url>
   <ns0:url>
     <ns0:loc>https://das-rebel.github.io/a3m-router/api</ns0:loc>
-    <ns0:lastmod>2026-05-31</ns0:lastmod>
+    <ns0:lastmod>2026-07-25</ns0:lastmod>
     <ns0:changefreq>monthly</ns0:changefreq>
     <ns0:priority>0.8</ns0:priority>
   </ns0:url>
   <ns0:url>
     <ns0:loc>https://das-rebel.github.io/a3m-router/llms.txt</ns0:loc>
-    <ns0:lastmod>2026-05-31</ns0:lastmod>
+    <ns0:lastmod>2026-07-25</ns0:lastmod>
     <ns0:changefreq>weekly</ns0:changefreq>
     <ns0:priority>0.7</ns0:priority>
   </ns0:url>
   <ns0:url>
     <ns0:loc>https://das-rebel.github.io/a3m-router/llms-full.txt</ns0:loc>
-    <ns0:lastmod>2026-05-31</ns0:lastmod>
+    <ns0:lastmod>2026-07-25</ns0:lastmod>
     <ns0:changefreq>weekly</ns0:changefreq>
     <ns0:priority>0.7</ns0:priority>
   </ns0:url>
   <ns0:url>
     <ns0:loc>https://das-rebel.github.io/a3m-router/docs/ai-plugin.json</ns0:loc>
-    <ns0:lastmod>2026-05-31</ns0:lastmod>
+    <ns0:lastmod>2026-07-25</ns0:lastmod>
     <ns0:changefreq>monthly</ns0:changefreq>
     <ns0:priority>0.6</ns0:priority>
   </ns0:url>
   <ns0:url>
     <ns0:loc>https://github.com/Das-rebel/a3m-router</ns0:loc>
-    <ns0:lastmod>2026-05-31</ns0:lastmod>
+    <ns0:lastmod>2026-07-25</ns0:lastmod>
     <ns0:changefreq>weekly</ns0:changefreq>
     <ns0:priority>0.9</ns0:priority>
   </ns0:url>
   <ns0:url>
     <ns0:loc>https://www.npmjs.com/package/adaptive-memory-multi-model-router</ns0:loc>
-    <ns0:lastmod>2026-05-31</ns0:lastmod>
+    <ns0:lastmod>2026-07-25</ns0:lastmod>
     <ns0:changefreq>weekly</ns0:changefreq>
     <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
+  <ns0:url>
+    <ns0:loc>https://www.npmjs.com/package/adaptive-memory-multi-model-router?activeTab=readme</ns0:loc>
+    <ns0:lastmod>2026-07-25</ns0:lastmod>
+    <ns0:changefreq>weekly</ns0:changefreq>
+    <ns0:priority>0.9</ns0:priority>
   </ns0:url>
 </ns0:urlset>

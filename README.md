@@ -1,10 +1,10 @@
 # A3M Router
 
-**OpenAI-compatible LLM routing gateway — routes requests to the cheapest capable provider per query.**
+**Universal LLM routing gateway — routes requests to the cheapest capable provider across 47+ models.**
 
-A3M Router is a stateless proxy that sits between your application and 47+ LLM providers. It inspects each request, estimates how complex it is, and routes it to the cheapest provider that can handle it — without retraining a model or managing GPU infrastructure.
+A3M Router is a stateless proxy between your application and 47+ LLM providers. It inspects each request, estimates how complex it is, and routes it to the cheapest capable provider — without retraining a model or managing GPU infrastructure.
 
-Drop-in replacement for OpenAI API calls. Switch providers or add new ones without changing application code.
+The API uses the OpenAI format (same endpoints, same request/response shapes), so existing SDKs and prompts work without changes. But it routes across any provider you configure, not just OpenAI.
 
 ---
 
@@ -88,6 +88,9 @@ const result = await executeEnsemble(
 - Enterprise SLA and support contracts
 
 A3M is a routing engine. LiteLLM is an enterprise platform. Use the right tool for your stage.
+
+### OpenAI-Compatible API
+The API format is OpenAI-compatible — same `/v1/chat/completions` endpoints, same request/response shapes — so any OpenAI-compatible SDK or proxy tool works with A3M without code changes. This is useful for switching providers behind an existing integration or for tooling that only supports the OpenAI format.
 
 ---
 

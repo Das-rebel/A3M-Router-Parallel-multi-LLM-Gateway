@@ -1,9 +1,9 @@
 {
   "name": "adaptive-memory-multi-model-router",
-  "version": "2.15.0",
+  "version": "2.15.1",
   "shortName": "A3M Router",
   "displayName": "A3M Router - Adaptive Memory Multi-Model Router",
-  "description": "OpenAI-compatible LLM routing gateway. Routes requests to cheapest capable provider across 47+ providers. Heuristic routing, parallel ensemble, semantic cache. Drop-in for OpenAI SDK.",
+  "description": "Universal LLM routing gateway. Routes requests to cheapest capable provider across 47+ models. Heuristic routing, parallel ensemble, semantic cache.",
   "main": "dist/index.js",
   "bin": {
     "a3m-router": "dist/cli.js",

@@ -1,9 +1,9 @@
 {
   "name": "adaptive-memory-multi-model-router",
-  "version": "2.15.1",
+  "version": "2.15.2",
   "shortName": "A3M Router",
   "displayName": "A3M Router - Adaptive Memory Multi-Model Router",
-  "description": "Universal LLM routing gateway. Routes requests to cheapest capable provider across 47+ models. Heuristic routing, parallel ensemble, semantic cache.",
+  "description": "Best in class open source LLM router across 47+ providers with Evolution-inspired routing: EXP3 diversity, MVT rate-limit rotation, optimal defense theory verification.",
   "main": "dist/index.js",
   "bin": {
     "a3m-router": "dist/cli.js",

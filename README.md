@@ -1,6 +1,6 @@
 # A3M Router
 
-**Universal LLM routing gateway with biology-inspired provider selection — routes to the cheapest capable model across 47+ providers.**
+**Best in class open source LLM router across 47+ providers with Evolution-inspired routing.**
 
 A3M Router is a stateless proxy between your application and 47+ LLM providers. It inspects each request, estimates how complex it is, and routes it to the cheapest capable provider — without retraining a model or managing GPU infrastructure. Provider selection is guided by ecological theory: EXP3 prevents monoculture, Charnov MVT optimizes rate-limit rotation, and Optimal Defense Theory allocates shadow verification to high-stakes queries.
 
@@ -252,7 +252,7 @@ Two lines total.
 
 ## Independent Benchmarks
 
-A3M ranks **No. 1** among known public routing baselines on RouterArena (8,400 queries, 96.77% accuracy, $0.0768/1K cost, 1.0000 robustness). See [`docs/BENCHMARK.md`](docs/BENCHMARK.md) for full reproducible benchmarks.
+RouterArena independent evaluation: 96.77% accuracy, $0.0768/1K cost, 1.0000 robustness (8,400 queries). See [`docs/BENCHMARK.md`](docs/BENCHMARK.md) for full reproducible benchmarks.
 
 ---
 

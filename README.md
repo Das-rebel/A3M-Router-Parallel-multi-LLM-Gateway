@@ -1,8 +1,8 @@
 # A3M Router
 
-**Universal LLM routing gateway — routes requests to the cheapest capable provider across 47+ models.**
+**Universal LLM routing gateway with biology-inspired provider selection — routes requests to the cheapest capable model across 47+ providers.**
 
-A3M Router is a stateless proxy between your application and 47+ LLM providers. It inspects each request, estimates how complex it is, and routes it to the cheapest capable provider — without retraining a model or managing GPU infrastructure.
+A3M Router is a stateless proxy between your application and 47+ LLM providers. It inspects each request, estimates how complex it is, and routes it to the cheapest capable provider — without retraining a model or managing GPU infrastructure. Provider selection is guided by ecological theory: EXP3 prevents monoculture, Charnov MVT optimizes rate-limit rotation, and Optimal Defense Theory allocates shadow verification to high-stakes queries.
 
 The API uses the OpenAI format (same endpoints, same request/response shapes), so existing SDKs and prompts work without changes. But it routes across any provider you configure, not just OpenAI.
 
@@ -116,7 +116,10 @@ Request → Guardrails → Cache → Router → Provider → Response
 
 **Semantic Cache** — Optional. Uses embedding similarity to return cached responses for repeated queries. Cache hit = instant response, zero provider cost.
 
-**Router** — Scores the query, selects tier, picks the cheapest healthy provider in that tier. Model quality scores update online via exponential moving average after each real call — no retraining. Includes EXP3 diversity weighting to prevent monoculture and MVT rate-limit rotation to avoid depleted providers.
+**Router** — Scores the query, selects tier, picks the cheapest healthy provider in that tier. Model quality scores update online via exponential moving average after each real call — no retraining. Three biologically-inspired mechanisms run inside the router:
+- **EXP3 diversity weighting** — negative frequency-dependent selection prevents any provider from dominating traffic (no competitive exclusion)
+- **Charnov MVT rate-limit rotation** — optimal departure time from depleting rate-limit windows
+- **ODT shadow sampler** — probabilistically verifies high-stakes queries proportional to query value (tissue value) and risk (attack probability)
 
 **Ensemble** — Optional. Calls multiple providers in parallel, scores responses on specificity and structure, returns the winner.
 

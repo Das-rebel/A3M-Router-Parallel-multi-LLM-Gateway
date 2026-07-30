@@ -1,6 +1,6 @@
 # A3M Router
 
-**Universal LLM routing gateway with biology-inspired provider selection — routes requests to the cheapest capable model across 47+ providers.**
+**Universal LLM routing gateway with biology-inspired provider selection — routes to the cheapest capable model across 47+ providers.**
 
 A3M Router is a stateless proxy between your application and 47+ LLM providers. It inspects each request, estimates how complex it is, and routes it to the cheapest capable provider — without retraining a model or managing GPU infrastructure. Provider selection is guided by ecological theory: EXP3 prevents monoculture, Charnov MVT optimizes rate-limit rotation, and Optimal Defense Theory allocates shadow verification to high-stakes queries.
 

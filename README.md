@@ -57,12 +57,21 @@ A3M stores no training data, requires no GPU, and routes in ~140ms overhead.
 
 ## Why Not Just Use LiteLLM?
 
-LiteLLM is the dominant open-source AI gateway (54K stars). It handles unified API access well. A3M Router adds two capabilities LiteLLM doesn't have built-in:
+LiteLLM is the dominant open-source AI gateway (54K stars). It handles unified API access well. A3M Router adds three capabilities LiteLLM doesn't have built-in:
 
 ### 1. Heuristic Routing
 LiteLLM routes by model name or requires you to specify which model to call. A3M's `model="auto"` mode analyzes the query content and picks the cheapest capable provider automatically. This is useful when you want cost efficiency without writing routing logic.
 
-### 2. Parallel Ensemble Execution
+### 2. Biology-Inspired Provider Selection
+A3M applies established ecological and evolutionary theory to routing decisions:
+
+**EXP3 Diversity Weighting** — Negative frequency-dependent selection prevents any single provider from dominating traffic. Providers above their fair share (1/n of total) receive a penalty proportional to their deviation. This mirrors how ecological niches prevent competitive exclusion — no species dominates when resource competition is symmetric.
+
+**Charnov MVT Rate-Limit Rotation** — When a provider's rate-limit window becomes depleted, A3M uses the Marginal Value Theorem (Charnov 1976) to decide the optimal time to switch. It leaves when the marginal remaining rate falls below the average rate including switch cost — the same logic that explains when animals should leave a depleting food patch.
+
+**ODT Shadow Verification** — For high-stakes queries, A3M can probabilistically sample a shadow provider to verify the primary's answer. The sampling probability follows Optimal Defense Theory: tissue value (query stakes) and attack probability (risk profile) scale verification effort proportionally. This is how plants allocate defensive compounds — expensive defenses go to valuable tissues.
+
+### 3. Parallel Ensemble Execution
 Sometimes you want the best answer regardless of cost. A3M can call multiple providers in parallel, score each response, and return the best one — with full provenance of which provider won and why.
 
 ```typescript
@@ -107,7 +116,7 @@ Request → Guardrails → Cache → Router → Provider → Response
 
 **Semantic Cache** — Optional. Uses embedding similarity to return cached responses for repeated queries. Cache hit = instant response, zero provider cost.
 
-**Router** — Scores the query, selects tier, picks the cheapest healthy provider in that tier. Model quality scores update online via exponential moving average after each real call — no retraining.
+**Router** — Scores the query, selects tier, picks the cheapest healthy provider in that tier. Model quality scores update online via exponential moving average after each real call — no retraining. Includes EXP3 diversity weighting to prevent monoculture and MVT rate-limit rotation to avoid depleted providers.
 
 **Ensemble** — Optional. Calls multiple providers in parallel, scores responses on specificity and structure, returns the winner.
 
@@ -237,6 +246,10 @@ Two lines total.
 - **npm downloads/month**: ~5,000
 - **Providers**: 47+
 - **License**: MIT
+
+## Independent Benchmarks
+
+A3M ranks **No. 1** among known public routing baselines on RouterArena (8,400 queries, 96.77% accuracy, $0.0768/1K cost, 1.0000 robustness). See [`docs/BENCHMARK.md`](docs/BENCHMARK.md) for full reproducible benchmarks.
 
 ---
 

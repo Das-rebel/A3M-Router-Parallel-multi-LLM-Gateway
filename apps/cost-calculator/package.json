@@ -1,0 +1,13 @@
+{
+  "name": "@a3m/cost-calculator",
+  "version": "1.0.0",
+  "description": "Interactive cost calculator for A3M Router savings",
+  "main": "calculator.js",
+  "scripts": {
+    "test": "vitest",
+    "serve": "npx serve ."
+  },
+  "devDependencies": {
+    "vitest": "^1.0.0"
+  }
+}

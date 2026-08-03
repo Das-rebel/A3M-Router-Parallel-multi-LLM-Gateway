@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A3M Router — Cost Calculator</title>
+  <link rel="stylesheet" href="calculator.css">
+  <meta name="description" content="Calculate your monthly savings with A3M Router's intelligent model routing vs paying for premium models directly.">
+  <style>
+    /* Inline critical CSS for faster first paint */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>A3M Router Cost Calculator</h1>
+    <p class="subtitle">See how much you save with intelligent model routing</p>
+
+    <!-- INPUT SECTION -->
+    <div class="card">
+      <div class="card-title">Your Traffic</div>
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="requests">Monthly Requests</label>
+          <input type="number" id="requests" value="100000" min="100" placeholder="e.g. 100000">
+        </div>
+        <div class="input-group">
+          <label for="avg-input">Avg Input Tokens / Request</label>
+          <input type="number" id="avg-input" value="500" min="1">
+        </div>
+      </div>
+      <div class="input-grid" style="margin-top: 0.75rem;">
+        <div class="input-group">
+          <label for="avg-output">Avg Output Tokens / Request</label>
+          <input type="number" id="avg-output" value="800" min="1">
+        </div>
+      </div>
+    </div>
+
+    <!-- MODEL MIX SECTION -->
+    <div class="card">
+      <div class="card-title">Model Mix</div>
+      <div class="model-mix" id="model-mix">
+        <div class="model-row">
+          <select class="model-select" data-index="0">
+            <option value="gpt-4o">GPT-4o</option>
+            <option value="claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+            <option value="gpt-4o-mini">GPT-4o-mini</option>
+            <option value="claude-3-haiku">Claude 3 Haiku</option>
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+            <option value="groq-llama-3.3-70b">Groq Llama 3.3 70B</option>
+            <option value="groq-mixtral-8x7b">Groq Mixtral 8x7B</option>
+          </select>
+          <input type="number" class="model-pct" data-index="0" value="100" min="0" max="100">
+          <span>%</span>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="addModelRow()">+ Add Model</button>
+        <button class="btn btn-secondary" onclick="removeModelRow()">- Remove</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="calculate()">Calculate Savings</button>
+        <button class="btn btn-secondary" onclick="resetDefaults()">Reset</button>
+      </div>
+    </div>
+
+    <!-- RESULTS SECTION (hidden until calculated) -->
+    <div id="results" class="hidden">
+      <div class="results-grid">
+        <div class="result-card">
+          <div class="result-label">Baseline Cost</div>
+          <div class="result-value baseline" id="baseline-cost">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">With A3M Router</div>
+          <div class="result-value" id="a3m-cost">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Monthly Savings</div>
+          <div class="result-value savings" id="savings-display">$0 (0%)</div>
+        </div>
+      </div>
+
+      <!-- Simple bar chart -->
+      <div class="card">
+        <div class="card-title">Cost Comparison</div>
+        <div class="chart-container" id="chart-container">
+          <div class="chart-bar baseline" id="chart-baseline"></div>
+          <div class="chart-bar a3m" id="chart-a3m"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--a3m-muted); margin-top:0.25rem;">
+          <span>Baseline</span>
+          <span>A3M Router</span>
+        </div>
+      </div>
+
+      <!-- Breakdown table -->
+      <div class="card">
+        <div class="card-title">Per-Model Breakdown</div>
+        <table class="breakdown-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Requests</th>
+              <th>Routed To</th>
+              <th class="num">Savings</th>
+            </tr>
+          </thead>
+          <tbody id="breakdown-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Share -->
+      <div class="card">
+        <div class="card-title">Share This Calculation</div>
+        <div class="share-bar">
+          <input type="text" id="share-url" readonly onclick="this.select()">
+          <button class="btn btn-secondary" onclick="copyShareUrl()">Copy</button>
+          <button class="btn btn-secondary" onclick="downloadCSV()">CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Prices based on OpenRouter provider rates. Actual savings depend on routing decisions.
+      <br>
+      <a href="https://github.com/Das-rebel/a3m-router">A3M Router on GitHub</a>
+    </div>
+  </div>
+
+  <script src="calculator.js"></script>
+  <script>
+    let modelCount = 1;
+
+    function getModelMix() {
+      const rows = document.querySelectorAll('.model-row');
+      const mix = [];
+      rows.forEach(row => {
+        const select = row.querySelector('.model-select');
+        const pct = row.querySelector('.model-pct');
+        if (select && pct && parseInt(pct.value) > 0) {
+          mix.push({ model: select.value, percent: parseInt(pct.value) });
+        }
+      });
+      return mix;
+    }
+
+    function addModelRow() {
+      const container = document.getElementById('model-mix');
+      const idx = container.children.length;
+      const row = document.createElement('div');
+      row.className = 'model-row';
+      row.innerHTML = `
+        <select class="model-select" data-index="${idx}">
+          <option value="gpt-4o">GPT-4o</option>
+          <option value="claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+          <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+          <option value="gpt-4o-mini">GPT-4o-mini</option>
+          <option value="claude-3-haiku">Claude 3 Haiku</option>
+          <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+          <option value="groq-llama-3.3-70b">Groq Llama 3.3 70B</option>
+          <option value="groq-mixtral-8x7b">Groq Mixtral 8x7B</option>
+        </select>
+        <input type="number" class="model-pct" data-index="${idx}" value="0" min="0" max="100">
+        <span>%</span>
+      `;
+      container.appendChild(row);
+    }
+
+    function removeModelRow() {
+      const container = document.getElementById('model-mix');
+      if (container.children.length > 1) {
+        container.removeChild(container.lastChild);
+      }
+    }
+
+    function resetDefaults() {
+      document.getElementById('requests').value = 100000;
+      document.getElementById('avg-input').value = 500;
+      document.getElementById('avg-output').value = 800;
+      // Reset model rows
+      const container = document.getElementById('model-mix');
+      while (container.children.length > 1) container.removeChild(container.lastChild);
+      const firstRow = container.querySelector('.model-row');
+      if (firstRow) {
+        firstRow.querySelector('.model-select').value = 'gpt-4o';
+        firstRow.querySelector('.model-pct').value = '100';
+      }
+      document.getElementById('results').classList.add('hidden');
+    }
+
+    function calculate() {
+      const requestsPerMonth = parseInt(document.getElementById('requests').value) || 100000;
+      const avgInput = parseInt(document.getElementById('avg-input').value) || 500;
+      const avgOutput = parseInt(document.getElementById('avg-output').value) || 800;
+      const modelMix = getModelMix();
+
+      // Override global AVG_TOKENS temporarily
+      const savedInput = AVG_TOKENS.input;
+      const savedOutput = AVG_TOKENS.output;
+      AVG_TOKENS.input = avgInput;
+      AVG_TOKENS.output = avgOutput;
+
+      const baseline = calculateBaselineCost({ requestsPerMonth, modelMix });
+      const a3m = calculateA3mCost({ requestsPerMonth, modelMix });
+      const savings = computeSavings(baseline.totalCost, a3m.totalCost);
+
+      AVG_TOKENS.input = savedInput;
+      AVG_TOKENS.output = savedOutput;
+
+      // Update display
+      document.getElementById('baseline-cost').textContent = `$${baseline.totalCost.toFixed(2)}`;
+      document.getElementById('a3m-cost').textContent = `$${a3m.totalCost.toFixed(2)}`;
+      document.getElementById('savings-display').textContent =
+        `$${savings.savingsAmount.toFixed(2)} (${savings.savingsPercent.toFixed(1)}%)`;
+
+      // Chart
+      const maxCost = Math.max(baseline.totalCost, a3m.totalCost);
+      const chartH = 220;
+      document.getElementById('chart-baseline').style.height =
+        `${(baseline.totalCost / maxCost) * chartH}px`;
+      document.getElementById('chart-a3m').style.height =
+        `${(a3m.totalCost / maxCost) * chartH}px`;
+
+      // Breakdown table
+      const tbody = document.getElementById('breakdown-body');
+      tbody.innerHTML = '';
+      a3m.breakdown.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${b.model}</td>
+          <td class="num">${b.requests.toLocaleString()}</td>
+          <td>${b.routedTo ? `→ ${b.routedTo}` : '—'}</td>
+          <td class="num savings-cell">${b.savings > 0 ? `$${b.savings.toFixed(2)}` : '—'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Share URL
+      const cfg = { requestsPerMonth, modelMix };
+      const link = generateShareableLink(cfg);
+      document.getElementById('share-url').value = link;
+
+      // Show results
+      document.getElementById('results').classList.remove('hidden');
+    }
+
+    function copyShareUrl() {
+      const input = document.getElementById('share-url');
+      navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.querySelector('.share-bar .btn-secondary:nth-child(1)');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 1500);
+      });
+    }
+
+    function downloadCSV() {
+      const requestsPerMonth = parseInt(document.getElementById('requests').value) || 100000;
+      const modelMix = getModelMix();
+      const baseline = calculateBaselineCost({ requestsPerMonth, modelMix });
+      const a3m = calculateA3mCost({ requestsPerMonth, modelMix });
+
+      let csv = 'Model,Requests,Routed To,Savings\n';
+      a3m.breakdown.forEach(b => {
+        csv += `${b.model},${b.requests},${b.routedTo || ''},${b.savings > 0 ? b.savings.toFixed(2) : 0}\n`;
+      });
+      csv += `\nTotal,${requestsPerMonth},,${a3m.totalSavings.toFixed(2)}\n`;
+      csv += `Baseline,$${baseline.totalCost.toFixed(2)}\n`;
+      csv += `A3M,$${a3m.totalCost.toFixed(2)}\n`;
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'a3m-cost-comparison.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Load from URL params on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const cfg = params.get('cfg');
+      if (cfg) {
+        try {
+          const decoded = decodeConfig(cfg);
+          document.getElementById('requests').value = decoded.requestsPerMonth;
+          // Set model mix
+          const container = document.getElementById('model-mix');
+          container.innerHTML = '';
+          decoded.modelMix.forEach((item, idx) => {
+            const row = document.createElement('div');
+            row.className = 'model-row';
+            row.innerHTML = `
+              <select class="model-select" data-index="${idx}">
+                <option value="gpt-4o">GPT-4o</option>
+                <option value="claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                <option value="gpt-4o-mini">GPT-4o-mini</option>
+                <option value="claude-3-haiku">Claude 3 Haiku</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                <option value="groq-llama-3.3-70b">Groq Llama 3.3 70B</option>
+                <option value="groq-mixtral-8x7b">Groq Mixtral 8x7B</option>
+              </select>
+              <input type="number" class="model-pct" data-index="${idx}" value="${item.percent}" min="0" max="100">
+              <span>%</span>
+            `;
+            row.querySelector('.model-select').value = item.model;
+            container.appendChild(row);
+          });
+          // Auto-calculate
+          calculate();
+        } catch (e) {
+          console.warn('Invalid config in URL', e);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

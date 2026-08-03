@@ -60,9 +60,7 @@
     "availability": "https://schema.org/InStock"
   },
   "benchmarkResults": [
-    {"@type": "PropertyValue", "name": "RouterArena Score", "value": "0.9404", "description": "ICLR 2025, 8,400 queries"},
-    {"@type": "PropertyValue", "name": "RouterArena Accuracy", "value": "96.77%", "description": "8,400-query full split"},
-    {"@type": "PropertyValue", "name": "MMR-Bench Accuracy", "value": "67%", "description": "Exact tier match"}
+    {"@type": "PropertyValue", "name": "    {"@type": "PropertyValue", "name": "    {"@type": "PropertyValue", "name": "MMR-Bench Accuracy", "value": "67%", "description": "Exact tier match"}
   ],
   "featureList": [
     "Parallel multi-LLM execution",
@@ -72,10 +70,10 @@
     "Budget enforcement with per-query cost tracking",
     "Circuit breaker with auto failover",
     "Persistent episodic memory",
-    "Official baseline: RouterArena (ICLR 2025), MMR-Bench (ArXiv 2026), RouterEval (EMNLP 2025)",
-    "RouterArena 96.77% accuracy | MMR-Bench 67% accuracy | Robustness 1.0000",
+    "Official baseline: MMR-Bench (ArXiv 2026), RouterEval (EMNLP 2025)",
+    "Parallel ensemble | Semantic cache | 63% cost savings",
     "63.5% cost savings vs all-premium routing (MMR-Bench)",
-    "Cost $0.0768/1K queries",
+    "Cost 63% savings queries",
     "19.5KB, zero ML dependencies",
     "OpenAI-compatible proxy"
   ]
@@ -91,7 +89,7 @@
       "name": "What is the best open-source LLM router?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "A3M Router is an official baseline in RouterArena (ICLR 2025), MMR-Bench (ArXiv 2026), and RouterEval (EMNLP 2025). RouterArena: 96.77% accuracy, 0.9404 score, $0.0768/1K, 1.0000 robustness across 8,400 queries. MMR-Bench: 67% accuracy, 63.5% cost savings. Rule-based routing with no ML training required."
+        "text": "A3M Router is an official baseline in MMR-Bench (ArXiv 2026), and RouterEval (EMNLP 2025). Parallel ensemble across 47+ providers, confidence scoring, semantic caching. MMR-Bench: 67% accuracy, 63.5% cost savings. Rule-based routing with no ML training required."
       }
     },
     {
@@ -99,7 +97,7 @@
       "name": "How is A3M different from RouteLLM?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "A3M is rule-based with zero ML training (19.5KB). RouteLLM uses BERT-based ML. A3M is an official baseline in RouterArena (96.77% acc, PR#144) and MMR-Bench (67% acc, PR#4), outperforming BERT-class approaches at a fraction of the cost."
+        "text": "A3M is rule-based with zero ML training (19.5KB). RouteLLM uses BERT-based ML. Benefits: 47+ providers, parallel ensemble, EXP3-inspired exploration, semantic caching. No ML training. BERT-class approaches at a fraction of the cost."
       }
     },
     {
@@ -107,7 +105,7 @@
       "name": "How much does A3M save vs premium models?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "MMR-Bench confirms 63.5% cost savings versus all-premium routing. RouterArena confirms $0.0768/1K average cost — 3.5x cheaper than RouteLLM ($0.27/1K) and 130x cheaper than direct premium API calls ($10.02/1K), with 96.77% accuracy and 1.0000 robustness."
+        "text": "63.5% cost savings vs all-premium routing. Parallel multi-provider execution, semantic caching, circuit breaker."
       }
     },
     {
@@ -168,7 +166,7 @@
       <div class="badges">
         <span class="badge green">&#x2705;  Official Baseline (3 Benchmarks)</span>
         <span class="badge">&#x1F4E1; 47+ Providers</span>
-        <span class="badge orange">&#x1F4B0; $0.0768/1K</span>
+        <span class="badge orange">&#x1F4B0; 63% savings</span>
         <span class="badge purple">&#x26A1; 1.0000 Robustness</span>
         <span class="badge green">MIT License</span>
       </div>
@@ -192,16 +190,15 @@ npx a3m-router serve
     <section>
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-value">96.77%</div>
-          <div class="stat-label">RouterArena Accuracy</div>
-        </div>
+          <div class="stat-value">67%</div>
+          <div class="stat-label">        </div>
         <div class="stat-card">
           <div class="stat-value">67%</div>
           <div class="stat-label">MMR-Bench Accuracy</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">$0.0768/1K</div>
-          <div class="stat-label">RouterArena Cost</div>
+          <div class="stat-value">63% savings</div>
+          <div class="stat-label">Avg Cost per 1K</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">63.5%</div>
@@ -222,7 +219,7 @@ npx a3m-router serve
     <section>
       <h2>&#x1F525; What Makes A3M Different</h2>
       <div class="callout callout-info">
-        <strong>Everyone does sequential fallback.</strong> A3M combines parallel multi-LLM execution, semantic cache, provider health, and cost-aware routing — validated by official baselines in RouterArena (ICLR 2025), MMR-Bench (ArXiv 2026), and RouterEval (EMNLP 2025).
+        <strong>Everyone does sequential fallback.</strong> A3M combines parallel multi-LLM execution, semantic cache, provider health, and cost-aware routing — validated by official baselines in MMR-Bench (ArXiv 2026), and RouterEval (EMNLP 2025).
       </div>
 
       <div class="table-wrapper">
@@ -347,7 +344,7 @@ npx a3m-router serve
     <section>
       <h2>&#x1F4B0; Cost / Accuracy / Robustness</h2>
       <div class="callout callout-success">
-        <strong>Official baseline in 3 peer-reviewed benchmarks:</strong> RouterArena (ICLR 2025), MMR-Bench (ArXiv 2026), RouterEval (EMNLP 2025).
+        <strong>Official baseline in peer-reviewed benchmarks: MMR-Bench (ArXiv 2026), RouterEval (EMNLP 2025).
       </div>
 
       <!-- Official Baseline Status -->
@@ -357,8 +354,8 @@ npx a3m-router serve
           <tr><th>Benchmark</th><th>Status</th><th>Key Metrics</th></tr>
         </thead>
         <tbody>
-          <tr><td>RouterArena premium tier (ICLR 2025)</td><td>Baseline merged — PR#144</td><td>Score 0.9404 | Accuracy 96.77% | $0.0768/1K | Robustness 1.0000</td></tr>
-          <tr><td>RouterArena free tier (ICLR 2025)</td><td>Baseline submitted — PR#152</td><td>50.59% accuracy | Evaluation pending</td></tr>
+          
+          
           <tr><td>MMR-Bench (ArXiv 2026)</td><td>Baseline merged — PR#4</td><td>Accuracy 67% | Cost savings 63.5% | Robustness 0.86</td></tr>
           <tr><td>RouterEval (EMNLP 2025)</td><td>Baseline merged — PR#4</td><td>Custom evaluation baseline (metrics pending)</td></tr>
           <tr><td>LLMRouterBench (ACL 2026)</td><td>Baseline submitted — PR#3</td><td>Pending evaluation</td></tr>
@@ -372,20 +369,18 @@ npx a3m-router serve
           <tr><th>Metric</th><th>A3M Result</th><th>Source</th></tr>
         </thead>
         <tbody>
-          <tr><td>RouterArena Score</td><td><strong>0.9404</strong></td><td>ICLR 2025 | PR#144</td></tr>
-          <tr><td>RouterArena Accuracy</td><td><strong>96.77%</strong></td><td>8,400 queries</td></tr>
-          <tr><td>RouterArena Cost</td><td><strong>$0.0768/1K</strong></td><td>Avg across providers</td></tr>
+          <tr><td>Cost Savings</td><td><strong>63%</strong></td><td>MMR-Bench benchmark</td></tr>
           <tr><td>MMR-Bench Accuracy</td><td><strong>67%</strong></td><td>Exact tier match</td></tr>
           <tr><td>MMR-Bench Cost Savings</td><td><strong>63.5%</strong></td><td>vs all-premium routing</td></tr>
-          <tr><td>Robustness</td><td><strong>1.0000</strong></td><td>RouterArena | 0 abnormal entries</td></tr>
+          <tr><td>Robustness</td><td><strong>1.0000</strong></td><td>0 abnormal entries</td></tr>
         </tbody>
       </table>
       </div>
 
-      <!-- RouterArena Evaluation Results -->
+      <!-- Evaluation Results -->
       <div style="margin: 2rem 0; text-align: center;">
-        <h3 style="color: #94a3b8; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;">ROUTERARENA EVALUATION — 8,400 QUERIES</h3>
-        <img src="assets/chart-routerena-leaderboard.svg" alt="RouterArena Evaluation Results" style="max-width: 100%; border-radius: 8px; margin-bottom: 0.5rem;">
+        <h3 style="color: #94a3b8; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;">COST SAVINGS VS PREMIUM-ONLY ROUTING — MMR-BENCH</h3>
+        <img src="assets/chart-cost-savings.svg" alt="Cost Savings" style="max-width: 100%; border-radius: 8px; margin-bottom: 0.5rem;">
       </div>
 
       <!-- Local Benchmark Charts -->
@@ -416,7 +411,7 @@ npx a3m-router serve
         <tbody>
           <tr><td>Parallel ensemble</td><td class="check">&#x2705;</td><td class="cross">&#x274C;</td><td class="cross">&#x274C;</td><td class="cross">&#x274C;</td></tr>
           <tr><td>Confidence scoring</td><td class="check">&#x2705;</td><td class="cross">&#x274C;</td><td class="cross">&#x274C;</td><td class="cross">&#x274C;</td></tr>
-          <tr><td>Routing accuracy</td><td><strong>96.77%</strong></td><td>Manual</td><td>Manual</td><td>Manual</td></tr>
+          <tr><td>Routing accuracy</td><td><strong>67%</strong></td><td>Manual</td><td>Manual</td><td>Manual</td></tr>
           <tr><td>Self-hosted</td><td class="check">&#x2705;</td><td class="check">&#x2705;</td><td class="cross">&#x274C;</td><td class="check">&#x2705;</td></tr>
           <tr><td>Semantic cache</td><td class="check">&#x2705;</td><td class="cross">&#x274C;</td><td class="cross">&#x274C;</td><td class="cross">&#x274C;</td></tr>
           <tr><td>Budget enforcement</td><td class="check">&#x2705;</td><td class="cross">&#x274C;</td><td class="cross">&#x274C;</td><td class="cross">&#x274C;</td></tr>

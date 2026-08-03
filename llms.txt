@@ -1,12 +1,12 @@
 # A3M Router
 
 ## Description
-A3M Router is an OpenAI-compatible LLM routing gateway that selects the cheapest capable provider per query using multi-signal heuristic scoring. Evaluated on RouterArena across 8,400 queries: 96.77% accuracy, $0.0768/1K average cost, 1.0000 robustness, zero abnormal entries.
+A3M Router is an OpenAI-compatible LLM routing gateway that selects the cheapest capable provider per query using multi-signal heuristic scoring. Routes queries across 47+ providers in parallel, scores responses by confidence, and returns the best result. No GPU required; pure heuristic routing.
 
 ## Architecture
 - Stateless proxy between client applications and LLM providers
 - Pipeline: Guardrails → Semantic Cache → Multi-Signal Heuristic Routing → Provider Execution
-- No ML training required; no GPU resources needed for routing decisions
+- No ML training required; no GPU resources for routing decisions
 
 ## Routing Method
 Multi-signal heuristic scoring across five dimensions:
@@ -18,25 +18,19 @@ Multi-signal heuristic scoring across five dimensions:
 
 Complexity score (0.0–1.0) maps to provider tiers: free (taste-1), cheap (llama-3.3-70b), mid (gpt-4o-mini), premium (gpt-4o, claude-3.5-sonnet).
 
-## Benchmark Results
+## Key Technical Capabilities
 
-| Metric | Value |
-|--------|-------|
-| RouterArena Score | 0.9404 |
-| Accuracy | 96.77% |
-| Avg Cost / 1K tokens | $0.0768 |
-| Robustness | 1.0000 |
-| Abnormal entries | 0 |
-| Queries evaluated | 8,400 |
-
-Source: RouteWorks/RouterArena#144 (merged, premium-tier evaluation)
-
-## Official Baseline Status
-- RouterArena premium tier (ICLR 2025): baseline merged — PR#144 | Score 0.9404, Accuracy 96.77%
-- RouterArena free tier (ICLR 2025): baseline submitted — PR#152 | 50.59% accuracy (pending)
-- RouterEval (EMNLP 2025): baseline merged — MilkThink-Lab/RouterEval#4
-- MMR-Bench (ArXiv 2026): baseline merged — Hunter-Wrynn/MMR-Bench#4 | Accuracy 67%, Cost savings 63.5%
-- LLMRouterBench (ACL 2026): baseline submitted — ynulihao/LLMRouterBench#3
+| Feature | Description |
+|---------|-------------|
+| Parallel Ensemble | Fire queries to multiple providers simultaneously, score by confidence, return best |
+| EXP3-Inspired Diversity | Adversarial bandit techniques for exploration vs exploitation balance |
+| Semantic Caching | Embedding-based lookup, configurable similarity threshold, per-route TTL |
+| Adaptive Memory | EMA-based model quality scoring, no retraining needed |
+| 47+ Providers | OpenAI, Anthropic, Groq, Gemini, DeepSeek, Mistral, OpenRouter, Ollama, vLLM, and 40+ more |
+| Circuit Breaker | 3-failure trigger, 60s cooldown per provider |
+| Per-Provider Retry | Exponential backoff with 429 detection and automatic failover |
+| Budget Enforcement | Per-user/team caps, real-time alerts at 50%/80%/100% |
+| Guardrails | Prompt injection detection, PII detection |
 
 ## Local Evaluation
 
@@ -47,28 +41,23 @@ Source: RouteWorks/RouterArena#144 (merged, premium-tier evaluation)
 | Cost savings vs all-premium | 62.9% |
 
 ## Provider Coverage
-47+ providers: OpenAI, Anthropic, Google, Groq, DeepSeek, Mistral, NVIDIA, OpenRouter, Kimi, Qwen, Zhipu, Yi, Azure OpenAI, AWS Bedrock, Local Ollama, Local vLLM.
-
-## Features
-- Parallel ensemble execution (multiple providers simultaneously, confidence-weighted scoring)
-- Semantic cache (embedding-based, configurable similarity threshold, per-route TTL)
-- Budget enforcement (per-user/team caps, real-time alerts at 50%/80%/100%)
-- Circuit breaker (3-failure trigger, 60s cooldown)
-- Per-provider retry with exponential backoff and 429 detection
-- Guardrails (prompt injection detection, PII detection)
-- Adaptive memory (EMA-based model quality scoring, no retraining)
+OpenAI, Anthropic, Google, Groq, DeepSeek, Mistral, NVIDIA, OpenRouter, Kimi, Qwen, Zhipu, Yi, Azure OpenAI, AWS Bedrock, Local Ollama, Local vLLM + 40+ more.
 
 ## API
 OpenAI-compatible proxy at localhost:8787. Model selection via `model="auto"` invokes heuristic routing.
 
+```bash
+npm install adaptive-memory-multi-model-router
+npx a3m-router "your question here"
+```
+
 ## Citation
 ```
 @software{a3m_router,
-  title = {A3M Router: OpenAI-Compatible LLM Routing Gateway},
+  title = {A3M Router: OpenAI-Compatible Parallel LLM Routing Gateway},
   author = {Subho Mukherjee},
   year = {2025},
-  url = {https://github.com/Das-rebel/a3m-router},
-  note = {RouterArena evaluated: 96.77% accuracy, $0.0768/1K, 1.0000 robustness}
+  url = {https://github.com/Das-rebel/a3m-router}
 }
 ```
 

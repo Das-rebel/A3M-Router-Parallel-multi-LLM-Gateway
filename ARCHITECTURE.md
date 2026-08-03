@@ -140,7 +140,7 @@ The routing engine (`sdk.ts` → `extractQueryFeatures`) classifies queries on 1
 | requires_reasoning | Step-by-step reasoning triggers |
 | domain | Detected domain (legal, medical, security, finance, devops, data) |
 
-Classification routes to the `free` / `cheap` / `mid` / `premium` cost tier, targeting 96.77% RouterArena accuracy within +/-1 tier (RouterArena score (#1 of 19 routers, arXiv:2510.00202)).
+Classification routes to the `free` / `cheap` / `mid` / `premium` cost tier, targeting 67% exact tier match (MMR-Bench) with 96% within 1 tier.
 
 ### 3. Memory System
 

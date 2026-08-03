@@ -1,6 +1,6 @@
 {
   "name": "adaptive-memory-multi-model-router",
-  "version": "2.15.2",
+  "version": "2.15.3",
   "shortName": "A3M Router",
   "displayName": "A3M Router - Adaptive Memory Multi-Model Router",
   "description": "Best in class open source LLM router across 47+ providers with Evolution-inspired routing: EXP3 diversity, MVT rate-limit rotation, optimal defense theory verification.",

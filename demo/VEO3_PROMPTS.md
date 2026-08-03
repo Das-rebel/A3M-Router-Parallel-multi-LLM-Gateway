@@ -195,7 +195,7 @@ Dark room, desk lamp, MacBook. Photorealistic. 16:9.
 ```
 Generate a dark-themed (#0d1117) product card on a laptop screen.
 Center: "A3M Router" in large white bold text with a subtle blue (#58a6ff) glow.
-Below in smaller text: "#1 on RouterArena · 213× cheaper than GPT-5 · 40 providers"
+Below in smaller text: "Parallel LLM Router · 213× cheaper than GPT-5 · 40 providers"
 Below that in a terminal-style box: "$ npm install adaptive-memory-multi-model-router"
 Bottom: GitHub logo and npm logo side by side.
 Very clean, minimal, dark. Apple-style presentation.
@@ -213,7 +213,7 @@ Photorealistic laptop on dark desk. 16:9.
     "film_grain": "very subtle"
   },
   "subject": {
-    "description": "A clean dark product card. The 'A3M Router' title fades in first with a subtle glow. Then the tagline '#1 on RouterArena · 213× cheaper · 40 providers' appears below with a brief typewriter effect. Finally the npm install command types out character by character with a blinking cursor. GitHub and npm logos fade in at bottom.",
+    "description": "A clean dark product card. The 'A3M Router' title fades in first with a subtle glow. Then the tagline 'Parallel LLM Router · 213× cheaper · 40 providers' appears below with a brief typewriter effect. Finally the npm install command types out character by character with a blinking cursor. GitHub and npm logos fade in at bottom.",
     "motion": "Title fades in with glow. Tagline types line by line. npm command types character by character. Cursor blinks at the end. Subtle continuous blue glow on the title."
   },
   "environment": {

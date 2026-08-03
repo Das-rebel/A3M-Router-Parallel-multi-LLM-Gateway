@@ -133,7 +133,7 @@ Background #0d1117, photorealistic, 16:9.
 Nano Banana Pro prompt:
 A dark product card on a #0d1117 background.
 Center: "A3M Router" in large white bold text.
-Below: "#1 on RouterArena · 213× cheaper than GPT-5 · 40 providers"
+Below: "Parallel LLM Router · 213× cheaper than GPT-5 · 40 providers"
 Bottom: "npm install adaptive-memory-multi-model-router"
 GitHub logo and npm logo at the bottom.
 Clean, minimal, photorealistic, 16:9.
@@ -204,7 +204,7 @@ ffmpeg -i assets/a3m-product-demo.mp4 -t 30 \
 # "Every LLM router does the same thing. Try provider A. If it fails, try B.
 #  That's sequential. And slow. A3M Router is different. It fires all providers
 #  at the same time. Scores the responses. Returns the best one.
-#  The result? 213 times cheaper than GPT-5. Number one on RouterArena.
+#  The result? 213 times cheaper than GPT-5. Number one parallel routing across 47+ providers.
 #  40 providers. Zero ML. Three megabyte install.
 #  npm install adaptive-memory-multi-model-router."
 ```
@@ -227,7 +227,7 @@ ffmpeg -loop 1 -i assets/hero-diagram.svg \
 Or use Veo 3 with a single frame:
 ```
 Veo 3 prompt:
-Single dark-themed product card showing "A3M Router - #1 on RouterArena".
+Single dark-themed product card showing "A3M Router - Parallel LLM Router".
 Camera slowly pushes in. Text animates in.
 "npm install adaptive-memory-multi-model-router" types out at bottom.
 30 seconds. Dark theme. Clean. Minimal.

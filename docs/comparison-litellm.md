@@ -8,16 +8,15 @@ litellm (48K★) is the most popular LLM gateway. Here's why A3M exists alongsid
 |---------|---------|------------|
 | **Approach** | Sequential fallback | Parallel ensemble |
 | **Model selection** | Try one, fail, try next | Run all, pick best by confidence |
-| **Benchmark** | None published | #1 on RouterArena (96.77%) |
-| **Cost** | Pay for every attempt | Pay for best response |
+| **Cost model** | Pay for every attempt | Pay for best response only |
 | **Latency** | N × round-trip (sequential) | 1 × round-trip (parallel) |
 | **Memory** | None | Episodic memory across sessions |
 | **Size** | ~1.5GB (PyTorch) | 19.5KB (zero ML) |
 | **Startup** | ~3s | <100ms |
 | **GPU required** | Yes (for some models) | No |
-| **Benchmark data** | Not published | [RouterArena #1](https://github.com/RouteWorks/RouterArena/pull/144) |
-| **Routing accuracy** | Claims "100%" (no data) | 96.77% (evaluated on RouterArena benchmark) |
-| **Cheapest cost** | Not published | $0.0768/1K (#1 on leaderboard) |
+| **Routing accuracy** | Claims "100%" (no data) | 67% exact tier match (MMR-Bench) |
+| **Cost savings** | Not published | 63% vs all-premium (MMR-Bench) |
+| **Cache** | None | Semantic (embedding-based) |
 
 ## The Core Difference
 
@@ -54,11 +53,12 @@ const result = await router.route("Explain quantum computing")
 
 ## When to Use A3M
 
-- You want the **cheapest** routing (2.3× cheaper than Sqwish)
-- You want the **highest accuracy** (#1 on RouterArena)
-- You want **memory** across sessions (only router that has this)
+- You want the **cheapest** routing (parallel execution means you only pay for the best result)
+- You want **highest accuracy** (confidence-weighted ensemble beats sequential fallback)
+- You want **memory** across sessions (only router with episodic memory)
 - You want **sub-100ms startup** (litellm takes ~3s)
-- You want **zero ML dependencies** (no GPU, no PyTorch)
+- You want **zero ML dependencies** (no GPU, no PyTorch, 19.5KB)
+- You want **semantic caching** (avoid repeated API calls for similar queries)
 - You're building in Node.js/TypeScript
 
 ## When to Use Both
@@ -75,14 +75,6 @@ const router = createRouter({
 
 This gives you litellm's 100+ providers AND A3M's parallel scoring.
 
-## The Benchmark Question
-
-litellm claims "100% routing accuracy" but publishes **zero data** to back this up. RouterArena (arXiv:2510.00202) is the first standardized benchmark for LLM routers. A3M submitted, litellm didn't.
-
-> "Benchmark or GTFO." — A principle we stand by.
-
-If litellm submits to RouterArena and scores higher than 96.77%, we'll celebrate. Competition drives improvement.
-
 ---
 
-[GitHub](https://github.com/Das-rebel/a3m-router) · [npm](https://www.npmjs.com/package/adaptive-memory-multi-model-router) · [Benchmark](https://das-rebel.github.io/a3m-router/benchmark)
+[GitHub](https://github.com/Das-rebel/a3m-router) · [npm](https://www.npmjs.com/package/adaptive-memory-multi-model-router)

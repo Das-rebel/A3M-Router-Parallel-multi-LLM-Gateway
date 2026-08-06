@@ -1,0 +1,57 @@
+{
+  "name": "@a3m/agentkit-adapter",
+  "version": "1.0.0",
+  "description": "A3M Router adapter for AgentKit - enables AI agents with intelligent multi-provider routing",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "vitest",
+    "lint": "eslint src/",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "agentkit",
+    "a3m",
+    "router",
+    "llm",
+    "multi-provider",
+    "ai",
+    "agent",
+    "openai",
+    "anthropic",
+    "routing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "@inngest/agent-kit": ">=0.0.1"
+  },
+  "dependencies": {
+    "@inngest/ai": ">=0.1.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@inngest/agent-kit": "^0.13.0",
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Das-rebel/adaptive-memory-multi-model-router"
+  }
+}

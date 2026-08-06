@@ -1,58 +1,16 @@
 {
   "name": "adaptive-memory-multi-model-router",
-  "version": "2.15.3",
-  "shortName": "A3M Router",
-  "displayName": "A3M Router - Adaptive Memory Multi-Model Router",
+  "version": "2.15.4",
   "description": "Best in class open source LLM router across 47+ providers with Evolution-inspired routing: EXP3 diversity, MVT rate-limit rotation, optimal defense theory verification.",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "bin": {
-    "a3m-router": "dist/cli.js",
-    "a3m": "dist/tui/index.js",
-    "a3m-tui": "dist/tui/index.js",
-    "adaptive-memory-multi-model-router": "dist/cli.js"
+    "a3m-router": "./bin/cli.js",
+    "a3m": "./bin/cli.js"
   },
-  "exports": {
-    ".": "./dist/index.js",
-    "./providers": "./dist/providers/registry.js",
-    "./memory": "./dist/memory/memoryTree.js",
-    "./cache": {
-      "import": "./dist/cache/semanticCache.js",
-      "require": "./dist/cache/semanticCache.js",
-      "types": "./dist/cache/semanticCache.d.ts"
-    },
-    "./compression": "./dist/utils/enhancedCompression.js",
-    "./autofetch": "./dist/memory/autoFetch.js",
-    "./vault": "./dist/memory/obsidianVault.js",
-    "./oauth": "./dist/integrations/oauth.js",
-    "./utils": "./dist/utils/tokenUtils.js",
-    "./cost": "./dist/cost/costTracker.js",
-    "./integrations": "./dist/integrations/index.js",
-    "./security": "./dist/security/inputValidation.js",
-    "./langchain": {
-      "import": "./dist/integrations/langchainAdapter.js",
-      "require": "./dist/integrations/langchainAdapter.js",
-      "types": "./dist/integrations/langchainAdapter.d.ts"
-    },
-    "./geo": "./dist/geo/generativeEngineOptimization.js",
-    "./server": {
-      "import": "./dist/server/proxyServer.js",
-      "require": "./dist/server/proxyServer.js",
-      "types": "./dist/server/proxyServer.d.ts"
-    },
-    "./guardrails": {
-      "import": "./dist/security/guardrails.js",
-      "require": "./dist/security/guardrails.js",
-      "types": "./dist/security/guardrails.d.ts"
-    },
-    "./analytics": {
-      "import": "./dist/analytics/costAnalytics.js",
-      "require": "./dist/analytics/costAnalytics.js",
-      "types": "./dist/analytics/costAnalytics.d.ts"
-    },
-    "./sdk": {
-      "import": "./dist/sdk.js",
-      "require": "./dist/sdk.js"
-    }
+  "scripts": {
+    "start": "node bin/cli.js serve",
+    "test": "node --test",
+    "lint": "eslint src/"
   },
   "keywords": [
     "a3m",
@@ -156,53 +114,16 @@
     "multi-llm-router",
     "multi-model-router"
   ],
-  "author": "Das-rebel <subho@example.com>",
-  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Das-rebel/a3m-router.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Das-rebel/a3m-router/issues"
+    "url": "https://github.com/Das-rebel/a3m-router"
   },
   "homepage": "https://das-rebel.github.io/a3m-router/",
-  "scripts": {
-    "test": "node test.js && node test/provider-test.js",
-    "test:py": "python3 -m pytest -q",
-    "test:all": "npm test && npm run test:py",
-    "eval:routing": "node eval/run_eval.js",
-    "eval:golden": "node eval/check_golden_routes.js",
-    "eval:faults": "node eval/run_fault_injection.js",
-    "eval:shadow": "node eval/run_shadow_eval.js",
-    "eval:report": "node eval/generate_report.js",
-    "eval:all": "npm run eval:routing && npm run eval:golden && npm run eval:faults && npm run eval:shadow && npm run eval:report",
-    "test:providers": "node test/provider-test.js",
-    "benchmark": "node test/benchmark.js",
-    "benchmark:verbose": "node test/benchmark.js --verbose",
-    "build": "npx tsc -p tsconfig.build.json",
-    "postinstall": "node scripts/postinstall-nudge.js"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "peerDependencies": {
-    "@langchain/core": ">=0.1.0"
-  },
-  "peerDependenciesMeta": {
-    "@langchain/core": {
-      "optional": true
-    }
-  },
   "dependencies": {
     "blessed": "^0.1.81",
     "nanoid": "^6.0.0"
   },
-  "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^26.1.1",
-    "esbuild": "^0.28.1",
-    "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
-  },
-  "types": "dist/index.d.ts"
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

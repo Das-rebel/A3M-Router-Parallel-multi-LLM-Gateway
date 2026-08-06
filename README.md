@@ -28,8 +28,6 @@ response = client.chat.completions.create(
 )  # Routes to Groq/Mistral — costs: $0.0001
 ```
 
-**Result:** Simple questions cost 300x less. Complex queries still go to premium models when needed.
-
 ---
 
 ## Why A3M Router?
@@ -43,6 +41,23 @@ response = client.chat.completions.create(
 
 ---
 
+## Framework Adapters
+
+A3M Router has drop-in adapters for **8 major frameworks**:
+
+| Framework | Adapter | Example |
+|-----------|---------|---------|
+| **LangChain** | `A3MLangChainAdapter` | `pip install adapters/langchain` |
+| **LlamaIndex** | `A3MLlamaIndexAdapter` | `pip install adapters/llamaindex` |
+| **AutoGen** | `A3MAutoGenAdapter` | Multi-agent conversations |
+| **Vercel AI SDK** | `A3MVercelAdapter` | Next.js apps |
+| **Haystack** | `A3MHaystackAdapter` | RAG pipelines |
+| **Pinecone** | `A3MPineconeAdapter` | Vector search + RAG |
+| **LangGraph** | `A3MLangGraphAdapter` | Stateful agents |
+| **CrewAI** | `A3MCompletion` | Multi-agent systems |
+
+---
+
 ## Quick Start
 
 ```bash
@@ -53,18 +68,105 @@ npm install adaptive-memory-multi-model-router
 npx a3m-router serve
 ```
 
-Then use it like any OpenAI-compatible API:
+---
 
+## Installation
+
+### Python Adapters
+```bash
+pip install adapters/
+```
+
+### Docker
+```bash
+docker-compose up -d
+```
+
+### npm
+```bash
+npm install adaptive-memory-multi-model-router
+```
+
+---
+
+## Framework Examples
+
+### LangChain
 ```python
-from openai import OpenAI
+from a3m_adapter import A3MLangChainAdapter
 
-client = OpenAI(base_url="http://localhost:8787/v1", api_key="not-needed")
+llm = A3MLangChainAdapter(model="auto", temperature=0.7)
+result = llm.invoke("What is retrieval-augmented generation?")
+```
 
-# Simple query → routes to cheapest capable (Groq, Mistral, etc.)
-response = client.chat.completions.create(
-    model="auto",
-    messages=[{"role": "user", "content": "What is Python?"}]
+### LlamaIndex
+```python
+from a3m_adapter import A3MLlamaIndexAdapter
+
+llm = A3MLlamaIndexAdapter(model="auto")
+response = llm.complete("Explain transformer architecture")
+```
+
+### AutoGen (Microsoft)
+```python
+from a3m_adapter import A3MAutoGenAdapter
+
+llm = A3MAutoGenAdapter(model="auto", parallel_ensemble=2)
+
+config = llm.create_agent_config()
+assistant = ConversableAgent(name="assistant", llm_config=config)
+```
+
+### Vercel AI SDK
+```python
+from a3m_adapter import A3MVercelAdapter, createA3MProvider
+
+result = await generateText({
+    model: createA3MProvider({"model": "auto", "parallel_ensemble": 2}),
+    prompt: "What is 2+2?",
+})
+```
+
+### Haystack (RAG)
+```python
+from a3m_adapter import A3MHaystackAdapter
+
+adapter = A3MHaystackAdapter(model="auto")
+result = adapter.predict(query="What is AI?", documents=retrieved_docs)
+```
+
+### Pinecone (Vector Search)
+```python
+from a3m_adapter import A3MPineconeAdapter
+
+adapter = A3MPineconeAdapter(model="auto")
+embedding = adapter.embed_query("What is quantum computing?")
+
+results = index.query(vector=embedding, top_k=5)
+```
+
+### LangGraph (Stateful Agents)
+```python
+from a3m_adapter import A3MLangGraphAdapter
+
+adapter = A3MLangGraphAdapter(model="auto", parallel_ensemble=2)
+agent = create_react_agent(adapter, tools=[...])
+
+result = agent.invoke({"messages": [{"role": "user", "content": "Hello"}]})
+```
+
+### CrewAI (Multi-Agent)
+```python
+from crewai.llms import A3MCompletion
+
+researcher = Agent(
+    role="Researcher",
+    goal="Find accurate information",
+    llm=A3MCompletion(model="auto"),
 )
+
+crew = Crew(agents=[researcher], tasks=[task])
+result = crew.kickoff()
 ```
 
 ---
@@ -83,20 +185,6 @@ router = A3MRouter(
 
 result = router.route(
     messages=[{"role": "user", "content": "Explain quantum entanglement"}],
-    ensemble_timeout_ms=10000,
-)
-
-# result.content     — winning response
-# result.provider    — which provider won
-# result.scores     — quality scores per provider
-# result.all_results — all responses for comparison
-```
-
-**Real-world example:**
-```python
-# Call Groq (fast/cheap) + OpenAI (quality) + DeepSeek (cost-effective) in parallel
-ensemble_result = router.route(
-    messages=[{"role": "user", "content": prompt}],
     ensemble_config={
         "providers": ["groq", "openai", "deepseek"],
         "timeout_ms": 15000,
@@ -104,87 +192,37 @@ ensemble_result = router.route(
     }
 )
 
-print(f"Best answer from: {ensemble_result.provider}")
-print(f"Response: {ensemble_result.content}")
-print(f"All scores: {ensemble_result.scores}")
+print(f"Best answer from: {result.provider}")
+print(f"Response: {result.content}")
+print(f"All scores: {result.scores}")
 ```
 
 ---
 
-## Multi-Agent Systems — CrewAI Example
+## Memory & Context
 
-Powerful for multi-agent systems where different agents need different model capabilities:
-
-```python
-from crewai import Agent, Task, Crew
-from crewai.llms import A3MCompletion
-
-# Research agent — needs factual accuracy
-researcher = Agent(
-    role="Research Analyst",
-    goal="Find accurate information",
-    backstory="Expert researcher",
-    llm=A3MCompletion(model="auto", temperature=0.3),
-)
-
-# Writer agent — needs creativity
-writer = Agent(
-    role="Content Writer", 
-    goal="Create engaging content",
-    backstory="Creative writer",
-    llm=A3MCompletion(model="auto", temperature=0.9),
-)
-
-# Critic agent — needs balance
-critic = Agent(
-    role="Quality Critic",
-    goal="Ensure quality", 
-    backstory="Detail editor",
-    llm=A3MCompletion(model="auto", temperature=0.5),
-)
-
-# Tasks with expected outputs
-research_task = Task(
-    description="Research AI trends",
-    expected_output="Detailed report with citations",
-    agent=researcher,
-)
-
-crew = Crew(
-    agents=[researcher, writer, critic],
-    tasks=[research_task],
-    process="hierarchical",
-    manager_llm=A3MCompletion(model="auto"),
-)
-
-result = crew.kickoff()
-```
-
----
-
-## LangChain + LlamaIndex Adapters
-
-Use A3M Router as a drop-in replacement:
+A3M Router includes **semantic memory** capabilities:
 
 ```python
-# LangChain
-from a3m_adapter import A3MLangChainAdapter
-
-llm = A3MLangChainAdapter(
+router = A3MRouter(
     model="auto",
-    temperature=0.7,
-    parallel_ensemble=2
+    memory={
+        "type": "semantic",
+        "window": 10,
+        "similarity_threshold": 0.85,
+    }
 )
 
-# Works with any LangChain chain
-from langchain import chain
-result = llm.invoke("What is retrieval-augmented generation?")
+# First call — caches context
+result1 = router.route(
+    messages=[{"role": "user", "content": "I'm building a Python web app"}]
+)
 
-# LlamaIndex
-from a3m_adapter import A3MLlamaIndexAdapter
-
-llm = A3MLlamaIndexAdapter(model="auto")
-response = llm.complete("Explain transformer architecture")
+# Second call — uses cached context
+result2 = router.route(
+    messages=[{"role": "user", "content": "What framework should I use?"}]
+)
+# A3M knows "Python web app" from context
 ```
 
 ---
@@ -222,45 +260,10 @@ Then maps to a tier:
 
 ---
 
-## Memory & Context
-
-A3M Router includes **semantic memory** capabilities:
-
-```python
-# Enable conversation memory
-router = A3MRouter(
-    model="auto",
-    memory={
-        "type": "semantic",      # Embeddings-based
-        "window": 10,              # Last 10 exchanges
-        "similarity_threshold": 0.85,
-    }
-)
-
-# First call — caches the context
-result1 = router.route(
-    messages=[{"role": "user", "content": "I'm building a Python web app"}]
-)
-
-# Second call — uses cached context automatically
-result2 = router.route(
-    messages=[{"role": "user", "content": "What framework should I use?"}]
-)
-# A3M knows "Python web app" from previous context
-```
-
-**Memory features:**
-- **Semantic cache** — Instant responses for similar queries
-- **Conversation context** — Maintains history across requests  
-- **Cross-session memory** — Remembers important facts
-- **Adaptive forgetting** — Auto-evicts stale information
-
----
-
 ## Provider Coverage
 
-| Provider | Tiers | Notes |
-|----------|-------|-------|
+| Provider | Tiers | Example Models |
+|----------|-------|---------------|
 | OpenAI | Premium, Mid | GPT-4o, GPT-4o-mini |
 | Anthropic | Premium, Mid | Claude-3.5-sonnet, Claude-3-haiku |
 | Google | Premium, Mid | Gemini-1.5-pro, Gemini-1.5-flash |
@@ -268,10 +271,10 @@ result2 = router.route(
 | DeepSeek | Cheap, Mid | DeepSeek-chat, DeepSeek-coder |
 | Mistral | Cheap, Mid | Mistral-large, Mistral-small |
 | NVIDIA | Premium | Nemotron |
-| Ollama | All | Self-hosted models |
-| vLLM | All | Self-hosted OpenAI-compatible |
+| Ollama | All | Local models |
+| vLLM | All | Self-hosted |
 
-**47+ providers total.** Availability checked at runtime.
+**47+ providers total.**
 
 ---
 
@@ -295,24 +298,16 @@ Request → Guardrails → Semantic Cache → Router → Provider → Response
                     (optional)
 ```
 
-- **Guardrails** — Prompt injection detection, PII filtering
-- **Semantic Cache** — Instant hits for repeated queries (zero cost)
-- **Router** — Scores query, selects tier, picks cheapest healthy provider
-- **Ensemble** — Optional parallel calls for best-answer mode
-
 ---
 
-## Installation
+## Demo
 
 ```bash
-# npm
-npm install adaptive-memory-multi-model-router
+# Start server
+npx a3m-router serve
 
-# Python
-pip install adaptive-memory-multi-model-router
-
-# Docker
-docker run -p 8787:8787 ghcr.io/das-rebel/a3m-router
+# Run demo
+python demo.py
 ```
 
 ---
@@ -331,8 +326,8 @@ docker run -p 8787:8787 ghcr.io/das-rebel/a3m-router
 
 - **npm downloads:** ~5,400/month
 - **Providers:** 47+
+- **Framework adapters:** 8
 - **License:** MIT
-- **Stars:** 10
 
 ---
 

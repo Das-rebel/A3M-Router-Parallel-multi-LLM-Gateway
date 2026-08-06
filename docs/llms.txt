@@ -2,7 +2,20 @@
 
 ## What is A3M Router?
 
-A3M Router is an intelligent LLM routing proxy that automatically selects the cheapest capable model for each request across 47+ providers.
+A3M Router is an intelligent LLM routing proxy that automatically selects the cheapest capable model for each request across 47+ providers. Saves 70-95% on AI costs.
+
+## Framework Adapters (8 Total)
+
+| Adapter | Framework | Use Case |
+|---------|-----------|---------|
+| A3MLangChainAdapter | LangChain | Chain-based AI workflows |
+| A3MLlamaIndexAdapter | LlamaIndex | RAG and document qa |
+| A3MAutoGenAdapter | AutoGen | Multi-agent conversations |
+| A3MVercelAdapter | Vercel AI SDK | Next.js apps |
+| A3MHaystackAdapter | Haystack | RAG pipelines |
+| A3MPineconeAdapter | Pinecone | Vector search + RAG |
+| A3MLangGraphAdapter | LangGraph | Stateful agents |
+| A3MCompletion | CrewAI | Multi-agent systems |
 
 ## Core Capabilities
 
@@ -19,7 +32,7 @@ A3M Router is an intelligent LLM routing proxy that automatically selects the ch
 - Use case: "best answer regardless of cost" mode
 
 ### 3. Biology-Inspired Routing
-- EXP3: Prevents provider monoculture (negative frequency-dependent selection)
+- EXP3: Prevents provider monoculture
 - Charnov MVT: Optimal rate-limit rotation timing
 - ODT Shadow Verification: Probabilistic verification for high-stakes queries
 
@@ -31,53 +44,16 @@ A3M Router is an intelligent LLM routing proxy that automatically selects the ch
 
 ## Supported Providers (47+)
 
-| Provider | Tier | Example Models |
-|----------|------|---------------|
-| OpenAI | Premium, Mid | gpt-4o, gpt-4o-mini |
-| Anthropic | Premium, Mid | claude-3.5-sonnet, claude-3-haiku |
-| Google | Premium, Mid | gemini-1.5-pro, gemini-1.5-flash |
-| Groq | Cheap | llama-3.3-70b, llama-3.1-8b |
-| DeepSeek | Cheap, Mid | deepseek-chat, deepseek-coder |
-| Mistral | Cheap, Mid | mistral-large, mistral-small |
-| NVIDIA | Premium | nemotron |
-| Ollama | All | Local models |
-| vLLM | All | Self-hosted |
+OpenAI, Anthropic, Google, Groq, DeepSeek, Mistral, NVIDIA, Ollama, vLLM, Azure OpenAI, AWS Bedrock, and 37 more.
 
 ## API Endpoints
 
-- `POST /v1/chat/completions` — OpenAI-compatible chat
-- `POST /v1/completions` — Text completions
-- `POST /v1/embeddings` — Embeddings
-- `GET /v1/models` — Available models
-- `GET /health` — Provider health
-- `GET /metrics` — Prometheus metrics
-
-## Integration Patterns
-
-### OpenAI SDK
-```python
-from openai import OpenAI
-client = OpenAI(base_url="http://localhost:8787/v1", api_key="not-needed")
-response = client.chat.completions.create(model="auto", messages=[...])
-```
-
-### LangChain
-```python
-from a3m_adapter import A3MLangChainAdapter
-llm = A3MLangChainAdapter(model="auto", parallel_ensemble=2)
-```
-
-### LlamaIndex
-```python
-from a3m_adapter import A3MLlamaIndexAdapter
-llm = A3MLlamaIndexAdapter(model="auto")
-```
-
-### CrewAI
-```python
-from crewai.llms import A3MCompletion
-agent = Agent(llm=A3MCompletion(model="auto"))
-```
+- POST /v1/chat/completions — OpenAI-compatible chat
+- POST /v1/completions — Text completions
+- POST /v1/embeddings — Embeddings
+- GET /v1/models — Available models
+- GET /health — Provider health
+- GET /metrics — Prometheus metrics
 
 ## Cost Savings
 
@@ -87,32 +63,14 @@ agent = Agent(llm=A3MCompletion(model="auto"))
 | Code generation | $0.05 | $0.002 | 96% |
 | Complex reasoning | $0.15 | $0.15 | 0% (correct) |
 
-## Memory Features
-
-- **Semantic Cache**: Instant responses for similar queries
-- **Conversation Context**: Maintains chat history
-- **Cross-Session Memory**: Remembers important facts
-- **Adaptive Forgetting**: Auto-evicts stale info
-
-## Benchmark Results
-
-RouterArena (8,400 queries):
-- Accuracy: 96.77%
-- Cost: $0.0768/1K
-- Robustness: 1.0000
-
 ## Installation
 
 ```bash
 npm install adaptive-memory-multi-model-router
-pip install adaptive-memory-multi-model-router
-docker run -p 8787:8787 ghcr.io/das-rebel/a3m-router
+pip install adapters/
+docker-compose up -d
 ```
 
 ## Keywords
 
-llm-router, ai-gateway, model-routing, cost-optimization, multi-provider, openai-compatible, langchain, llamaindex, crewai, parallel-execution, semantic-cache, adaptive-routing, failover, guardrails, cache, budget-alerts, streaming, retries, circuit-breaker
-
-## License
-
-MIT
+llm-router, ai-gateway, model-routing, cost-optimization, multi-provider, openai-compatible, langchain, llamaindex, autogena, vercel-ai, haystack, pinecone, langgraph, crewai, parallel-execution, semantic-cache, adaptive-routing, failover, guardrails, cache, budget-alerts, streaming, retries, circuit-breaker, multi-agent, rag, embeddings, vector-search

@@ -330,3 +330,92 @@ Response:
 ## License
 
 MIT
+
+---
+
+## Framework Adapter Details
+
+### LangChain Adapter
+
+```python
+from a3m_adapter import A3MLangChainAdapter
+
+llm = A3MLangChainAdapter(
+    model="auto",
+    temperature=0.7,
+    parallel_ensemble=2
+)
+
+# Works with any LangChain chain
+result = llm.invoke("What is RAG?")
+```
+
+### LlamaIndex Adapter
+
+```python
+from a3m_adapter import A3MLlamaIndexAdapter
+
+llm = A3MLlamaIndexAdapter(model="auto")
+response = llm.complete("Explain transformers")
+```
+
+### AutoGen Adapter
+
+```python
+from a3m_adapter import A3MAutoGenAdapter
+
+llm = A3MAutoGenAdapter(model="auto", parallel_ensemble=2)
+config = llm.create_agent_config()
+
+assistant = ConversableAgent(name="assistant", llm_config=config)
+```
+
+### Vercel AI SDK Adapter
+
+```python
+from a3m_adapter import createA3MProvider
+
+result = await generateText({
+    model: createA3MProvider({"model": "auto", "parallel_ensemble": 2}),
+    prompt: "What is 2+2?",
+})
+```
+
+### Haystack Adapter (RAG)
+
+```python
+from a3m_adapter import A3MHaystackAdapter
+
+adapter = A3MHaystackAdapter(model="auto")
+result = adapter.predict(query="What is AI?", documents=retrieved_docs)
+```
+
+### Pinecone Adapter (Vector Search)
+
+```python
+from a3m_adapter import A3MPineconeAdapter
+
+adapter = A3MPineconeAdapter(model="auto")
+embedding = adapter.embed_query("quantum computing")
+results = index.query(vector=embedding, top_k=5)
+```
+
+### LangGraph Adapter (Stateful Agents)
+
+```python
+from a3m_adapter import A3MLangGraphAdapter
+
+adapter = A3MLangGraphAdapter(model="auto", parallel_ensemble=2)
+agent = create_react_agent(adapter, tools=[...])
+result = agent.invoke({"messages": [{"role": "user", "content": "Hello"}]})
+```
+
+### CrewAI Adapter (Multi-Agent)
+
+```python
+from crewai.llms import A3MCompletion
+
+agent = Agent(llm=A3MCompletion(model="auto"))
+crew = Crew(agents=[agent], tasks=[task])
+result = crew.kickoff()
+```

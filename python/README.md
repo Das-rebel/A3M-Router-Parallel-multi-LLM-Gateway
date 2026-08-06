@@ -1,18 +1,35 @@
 # A3M Router Python SDK
 
-Python SDK for the A3M Router — an intelligent LLM routing proxy that selects the best model for each query based on complexity, cost, and capability.
+**Intelligent LLM routing for Python — routes to cheapest capable model across 47+ providers.**
 
-## Install
+Python client + framework adapters for [A3M Router](https://github.com/Das-rebel/a3m-router).
 
 ```bash
 pip install a3m-router
 ```
 
-Requires Python 3.8+. Only dependency: `httpx`.
+---
+
+## TL;DR
+
+```python
+from a3m import A3MRouter
+
+router = A3MRouter()  # localhost:8787
+
+# Auto-routes simple queries to cheap providers (Groq, DeepSeek, etc.)
+# Complex queries to premium providers (GPT-4o, Claude, etc.)
+response = await router.chat("What is 2+2?")
+# → Routed to Groq, costs ~$0.000001
+```
+
+---
 
 ## Quick Start
 
-### Async Client (recommended)
+```bash
+pip install a3m-router
+```
 
 ```python
 import asyncio
@@ -20,82 +37,182 @@ from a3m import A3MRouter
 
 async def main():
     async with A3MRouter() as router:
-        # Chat with automatic model routing
+        # Simple chat
         response = await router.chat("What is 2+2?")
         print(response["choices"][0]["message"]["content"])
-
-        # Check routing decision without executing
-        decision = await router.route("Write a Python web scraper")
-        print(decision)  # RoutingDecision(model=groq/llama-3.3-70b, tier=cheap, cost=$0.000000, complexity=0.35)
-
-        # Stream a response
-        async for token in router.stream_chat("Tell me a joke"):
+        
+        # Get routing decision
+        decision = await router.route("Write a Python decorator")
+        print(f"Routed to: {decision.model} ({decision.tier} tier, ${decision.cost:.6f})")
+        
+        # Stream
+        async for token in router.stream_chat("Tell me a story"):
             print(token, end="", flush=True)
-
-        # List available models
-        models = await router.models()
-
-        # Get cost analytics
+        
+        # Health check
+        health = await router.health()
+        print(f"Providers: {len(health.get('providers', {}))}")
+        
+        # Cost analytics
         report = await router.cost_report()
-        print(f"Total requests: {report.total_requests}")
         print(f"Savings: {report.savings_percentage:.1f}%")
 
 asyncio.run(main())
 ```
 
-### Sync Client
+---
 
-```python
-from a3m.sync_client import A3MRouterSync
+## Framework Adapters
 
-with A3MRouterSync() as router:
-    response = router.chat("What is 2+2?")
-    print(response["choices"][0]["message"]["content"])
+| Adapter | Import | Use Case |
+|---------|--------|----------|
+| **LangChain** | `from a3m import LangChainAdapter` | Chain-based AI workflows |
+| **LlamaIndex** | `from a3m import LlamaIndexAdapter` | RAG and document QA |
+| **Qdrant** | `from a3m import QdrantAdapter` | Vector search + RAG |
+| **Weaviate** | `from a3m import WeaviateAdapter` | Vector search + RAG |
 
-    decision = router.route("Explain quantum computing")
-    print(f"Routed to {decision.model} (tier={decision.tier}, cost=${decision.cost:.6f})")
+Install adapters:
+```bash
+pip install a3m-router[langchain]     # LangChain
+pip install a3m-router[llamaindex]   # LlamaIndex
+pip install a3m-router[qdrant]        # Qdrant
+pip install a3m-router[weaviate]      # Weaviate
+pip install a3m-router[all]           # All adapters
 ```
 
-### With OpenAI SDK
+---
 
-The router is OpenAI-compatible, so you can use the standard OpenAI SDK:
+## LangChain
 
 ```python
-from openai import AsyncOpenAI
+from a3m import A3MRouter, LangChainAdapter
+from langchain.schema import HumanMessage
 
-client = AsyncOpenAI(base_url="http://localhost:8787/v1", api_key="not-needed")
-response = await client.chat.completions.create(
-    model="auto",
-    messages=[{"role": "user", "content": "Hello"}]
+# Use as LangChain LLM
+llm = LangChainAdapter(base_url="http://localhost:8787")
+response = llm([HumanMessage(content="What is RAG?")])
+```
+
+---
+
+## LlamaIndex
+
+```python
+from a3m import LlamaIndexAdapter
+
+llm = LlamaIndexAdapter()
+response = llm.complete("Explain transformers")
+```
+
+---
+
+## Qdrant RAG
+
+```python
+from a3m import Q3MRouter, QdrantAdapter
+
+client = QdrantAdapter(
+    a3m_base_url="http://localhost:8787",
+    collection_name="docs",
+    host="localhost",
+    port=6333,
 )
+
+results = client.rag_search(
+    query="What is machine learning?",
+    collection_name="docs",
+    limit=5,
+)
+print(results["answer"])
 ```
+
+---
+
+## Weaviate RAG
+
+```python
+from a3m import WeaviateAdapter
+
+client = WeaviateAdapter(
+    a3m_base_url="http://localhost:8787",
+    weaviate_url="http://localhost:8080",
+)
+
+results = client.rag_search(
+    query="What is AI?",
+    class_name="Article",
+    properties=["title", "content"],
+)
+print(results["answer"])
+```
+
+---
 
 ## API Reference
 
 ### A3MRouter (async)
 
+```python
+router = A3MRouter(
+    base_url="http://localhost:8787",
+    timeout=30.0,
+)
+```
+
 | Method | Description |
 |--------|-------------|
-| `chat(message, model="auto", max_tokens=100, temperature=0.7, system=None)` | Send a chat message with automatic routing |
-| `route(query)` | Get routing decision without executing |
+| `chat(message)` | Send chat message with auto-routing |
+| `route(query)` | Get routing decision (no execution) |
 | `route_batch(queries)` | Route multiple queries |
-| `stream_chat(message, model="auto", max_tokens=100)` | Stream response tokens |
+| `stream_chat(message)` | Stream response tokens |
 | `models()` | List available models |
-| `health()` | Check router health |
-| `cost_report()` | Get cost analytics |
+| `health()` | Provider health status |
+| `cost_report()` | Cost analytics |
 
 ### RoutingDecision
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `model` | str | Selected model name |
-| `tier` | str | Cost tier (free/cheap/mid/premium) |
-| `cost` | float | Estimated cost per request |
-| `complexity` | float | Query complexity score (0-1) |
-| `reasoning` | str | Why this model was chosen |
-| `fallback_models` | list | Alternative models if primary fails |
-| `is_free` | bool | Property — True if cost is $0 |
-| `is_expert` | bool | Property — True if complexity >= 0.65 |
+```python
+decision = await router.route("Write Python code")
+# decision.model → "groq/llama-3.3-70b"
+# decision.tier → "cheap"
+# decision.cost → 0.000001
+# decision.is_free → False
+# decision.is_expert → False
+# decision.reasoning → "Simple query, routed to budget tier"
+```
+
+---
+
+## Routing Tiers
+
+| Tier | Providers | Cost | When |
+|------|-----------|------|-------|
+| **free** | Ollama, vLLM | $0 | Local models |
+| **cheap** | Groq, DeepSeek, Mistral | ~$0.001/1K | Simple Q&A, short code |
+| **mid** | GPT-4o-mini, Claude-haiku | ~$0.01/1K | Standard tasks |
+| **premium** | GPT-4o, Claude-sonnet | ~$0.15/1K | Complex reasoning |
+
+---
+
+## Server Setup
+
+```bash
+# via npx
+npx a3m-router serve
+
+# via Docker
+docker-compose up -d
+```
+
+---
+
+## Links
+
+- [A3M Router GitHub](https://github.com/Das-rebel/a3m-router)
+- [npm Package](https://www.npmjs.com/package/adaptive-memory-multi-model-router)
+- [Documentation](https://das-rebel.github.io/a3m-router)
+
+---
 
 ## License
 

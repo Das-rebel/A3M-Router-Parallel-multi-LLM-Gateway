@@ -1,6 +1,14 @@
 # A3M Router
 
-**Best in class open source LLM router across 47+ providers with Evolution-inspired routing.**
+[![npm](https://img.shields.io/npm/v/adaptive-memory-multi-model-router?style=flat-square)](https://www.npmjs.com/package/adaptive-memory-multi-model-router)
+[![npm](https://img.shields.io/npm/dm/adaptive-memory-multi-model-router?style=flat-square)](https://www.npmjs.com/package/adaptive-memory-multi-model-router)
+[![TotalDownloads](https://img.shields.io/badge/downloads-33%2C194%20total-33K%20-yellow?style=flat-square)](https://www.npmjs.com/package/adaptive-memory-multi-model-router)
+[![GitHub stars](https://img.shields.io/github/stars/Das-rebel/a3m-router?style=flat-square)](https://github.com/Das-rebel/a3m-router/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Das-rebel/a3m-router?style=flat-square)](https://github.com/Das-rebel/a3m-router/network)
+[![CI](https://github.com/Das-rebel/a3m-router/actions/workflows/ci.yml/badge.svg)](https://github.com/Das-rebel/a3m-router/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+
+**Best in class open source LLM router across 47+ providers — 33K+ downloads with Evolution-inspired routing.**
 
 A3M Router is a stateless proxy between your application and 47+ LLM providers. It inspects each request, estimates how complex it is, and routes it to the cheapest capable provider — without retraining a model or managing GPU infrastructure. Provider selection is guided by ecological theory: EXP3 prevents monoculture, Charnov MVT optimizes rate-limit rotation, and Optimal Defense Theory allocates shadow verification to high-stakes queries.
 
@@ -245,10 +253,14 @@ Two lines total.
 
 ## Project Stats
 
-- **Stars**: 10
-- **npm downloads/month**: ~5,000
-- **Providers**: 47+
-- **License**: MIT
+| Metric | Value |
+|--------|-------|
+| **Total Downloads** | 33,194+ |
+| **Monthly Downloads** | ~5,400 (Jul 2026) |
+| **GitHub Stars** | 10 |
+| **GitHub Forks** | 2 |
+| **LLM Providers** | 47+ |
+| **License** | MIT |
 
 ## Independent Benchmarks
 

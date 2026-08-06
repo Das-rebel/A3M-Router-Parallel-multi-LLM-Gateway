@@ -1,0 +1,5 @@
+name: a3m_router
+version: 1.0.0
+description: Kong plugin that routes LLM API calls through A3M Router for intelligent model selection
+author: A3M Team
+license: MIT

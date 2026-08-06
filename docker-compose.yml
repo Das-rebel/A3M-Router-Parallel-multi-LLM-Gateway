@@ -1,0 +1,84 @@
+# A3M Router Kong Plugin - Docker Compose Setup
+# Spins up Kong Gateway with A3M Router plugin and A3M Router backend
+
+version: "3.8"
+
+services:
+  # Kong Gateway
+  kong:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: a3m-kong
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
+      KONG_PLUGINS: bundled,a3m_router
+      KONG_LOG_LEVEL: info
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_PLUGINS: a3m_router
+    ports:
+      - "8000:8000"   # HTTP proxy
+      - "8443:8443"   # HTTPS proxy
+      - "8001:8001"   # Admin API HTTP
+      - "8444:8444"   # Admin API HTTPS
+    volumes:
+      - ./kong.yml:/usr/local/kong/kong.yml:ro
+      - ./kong-plugin/a3m_router:/usr/local/kong/plugin/a3m_router:ro
+    depends_on:
+      a3m-router:
+        condition: service_healthy
+    networks:
+      - a3m-network
+    restart: unless-stopped
+
+  # A3M Router Backend
+  a3m-router:
+    image: node:18-alpine
+    container_name: a3m-router
+    working_dir: /app
+    command: sh -c "npm install -g @das-rebel/a3m-router && node $(npm root -g)/a3m-router/dist/server.js"
+    environment:
+      PORT: 8787
+      HOST: 0.0.0.0
+      NODE_ENV: production
+      # A3M Router configuration
+      LOG_LEVEL: info
+      DEFAULT_MODEL: openai/gpt-4o-mini
+      ENABLE_STREAMING: "true"
+    ports:
+      - "8787:8787"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8787/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - a3m-network
+    restart: unless-stopped
+
+  # Mock LLM Provider (for fallback testing)
+  mock-openai:
+    image: mockserver/mockserver:5.15.0
+    container_name: mock-openai
+    environment:
+      MOCKSERVER_INITIALIZATION_JSON_PATH: /config/mock-openai.json
+    ports:
+      - "1080:1080"
+    volumes:
+      - ./mock-openai.json:/config/mock-openai.json:ro
+    networks:
+      - a3m-network
+    restart: unless-stopped
+
+networks:
+  a3m-network:
+    driver: bridge
+
+volumes:
+  kong-data:
+    driver: local

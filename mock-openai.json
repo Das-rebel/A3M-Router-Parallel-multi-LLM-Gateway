@@ -1,0 +1,40 @@
+{
+  "mockOpenAI": true,
+  "httpOverride": true,
+  "services": [
+    {
+      "method": "POST",
+      "path": "/v1/chat/completions",
+      "statusCode": 200,
+      "contentType": "application/json",
+      "body": {
+        "id": "chatcmpl-mock-001",
+        "object": "chat.completion",
+        "created": 1234567890,
+        "model": "gpt-3.5-turbo",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "This is a response from the mock OpenAI provider (fallback target). Kong plugin successfully routed to fallback after A3M failure."
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 10,
+          "completion_tokens": 30,
+          "total_tokens": 40
+        }
+      },
+      "delay": {
+        "type": "fixed",
+        "value": 500
+      }
+    }
+  ],
+  "addedHeaders": [
+    "x-mock-provider: openai-compatible"
+  ]
+}

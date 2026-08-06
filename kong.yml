@@ -1,0 +1,55 @@
+# Kong Gateway Declarative Configuration for A3M Router Plugin
+
+_format_version: "3.0"
+
+# Global plugin configuration
+plugins:
+  - name: a3m_router
+    config:
+      a3m_base_url: http://a3m-router:8787
+      default_model: openai/gpt-4o-mini
+      parallel_ensemble: false
+      a3m_timeout_ms: 30000
+      pass_headers: true
+      debug_headers: true
+      max_retries: 1
+      log_level: info
+      exclude_routes: []
+    route: all
+
+# Upstream services
+services:
+  # A3M Router service
+  - name: a3m-router-service
+    url: http://a3m-router:8787/v1/chat/completions
+    routes:
+      - name: a3m-router-route
+        paths:
+          - /llm/v1/chat/completions
+        strip_path: false
+    plugins:
+      - name: a3m_router
+        config:
+          a3m_base_url: http://a3m-router:8787
+          default_model: openai/gpt-4o-mini
+          parallel_ensemble: false
+          a3m_timeout_ms: 30000
+          pass_headers: true
+          debug_headers: true
+          max_retries: 1
+          log_level: info
+
+  # Direct OpenAI service (fallback)
+  - name: openai-service
+    url: http://mock-openai:1080/v1/chat/completions
+    routes:
+      - name: openai-route
+        paths:
+          - /direct/v1/chat/completions
+        strip_path: false
+
+# Consumers for API key authentication
+consumers:
+  - username: test-consumer
+    keyauth_credentials:
+      - key: test-api-key

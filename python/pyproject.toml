@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "a3m-router"
 version = "2.2.0"
-description = "Intelligent LLM routing for Python — routes to cheapest capable model across 47+ providers"
+description = "Auto-selects cheapest capable LLM from 47+ providers — 70-95% cost savings"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"

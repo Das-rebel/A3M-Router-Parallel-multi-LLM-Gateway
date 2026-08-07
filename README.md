@@ -262,9 +262,9 @@ Two lines total.
 | **LLM Providers** | 47+ |
 | **License** | MIT |
 
-## Independent Benchmarks
+## Benchmarks
 
-RouterArena independent evaluation: 96.77% accuracy, $0.0768/1K cost, 1.0000 robustness (8,400 queries). See [`docs/BENCHMARK.md`](docs/BENCHMARK.md) for full reproducible benchmarks.
+A3M Router's parallel ensemble execution is unique — it routes queries to multiple providers simultaneously and picks the best response. See [`docs/BENCHMARK.md`](docs/BENCHMARK.md) for cost comparisons.
 
 ---
 

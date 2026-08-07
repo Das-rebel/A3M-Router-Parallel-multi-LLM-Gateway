@@ -17,7 +17,7 @@ A3M Router is the **only open-source LLM gateway** that does **parallel multi-LL
 | **Parallel Execution** | **YES** (ensemble) | NO (sequential) | NO (fallback) | NO (load bal) | NO (sequential) | NO (fallback) |
 | **Confidence Scoring** | **YES** (voting) | NO | NO | NO | NO | NO |
 | **Result Merging** | **YES** (weighted) | NO | NO | NO | NO | NO |
-| **Independent Benchmarks** | **YES** (96.77%) | YES (8ms P95) | NO | NO | NO | NO |
+| **Independent Benchmarks** | Pending submission | YES (8ms P95) | NO | NO | NO | NO |
 | **Open Source** | YES (MIT) | YES (MIT) | NO | YES (MIT) | YES (MIT) | YES (MIT) |
 | **Providers Supported** | 47+ | 100+ | 60+ | 25+ | 250+ | 100+ |
 | **Streaming Support** | YES | YES | YES | YES | YES | YES |
@@ -94,7 +94,7 @@ Query -> Run GPT-4o + Claude + Gemini simultaneously -> Score -> Pick best
 - **+26%** answer quality over single-best provider
 - **-57%** hallucination rate (1.8% vs 4.2%)
 - **+19pp** multi-step reasoning accuracy (91% vs 72%)
-- **RouterArena PR #144:** 0.9404 score, 96.77% accuracy, $0.0768/1K, 1.0000 robustness, 0 abnormal entries across 8,400 queries
+- Parallel ensemble execution achieves +26% answer quality over single-best provider (see benchmarks)
 
 ---
 

@@ -3,7 +3,7 @@ from .client import A3MRouter, A3MRouterError
 from .sync_client import A3MRouterSync
 from .models import RoutingDecision, CostReport
 
-__version__ = "2.2.0"
+__version__ = "2.2.1"
 
 __all__ = [
     "A3MRouter",

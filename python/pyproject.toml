@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "a3m-router"
-version = "2.2.0"
+version = "2.2.1"
 description = "Auto-selects cheapest capable LLM from 47+ providers — 70-95% cost savings"
 readme = "README.md"
 license = {text = "MIT"}

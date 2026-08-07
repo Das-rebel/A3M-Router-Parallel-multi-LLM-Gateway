@@ -11,19 +11,6 @@ license = {text = "MIT"}
 requires-python = ">=3.8"
 dependencies = ["httpx>=0.24.0"]
 
-[project.optional-dependencies]
-langchain = ["langchain>=0.1.0"]
-llamaindex = ["llamaindex>=0.9.0"]
-qdrant = ["qdrant-client>=1.7.0"]
-weaviate = ["weaviate-client>=4.0.0"]
-adapters = [
-    "langchain>=0.1.0",
-    "llamaindex>=0.9.0",
-    "qdrant-client>=1.7.0",
-    "weaviate-client>=4.0.0",
-]
-dev = ["pytest>=7.4.0", "pytest-asyncio>=0.21.0", "black>=23.0.0"]
-
 keywords = [
     "llm",
     "routing",
@@ -59,6 +46,19 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
+
+[project.optional-dependencies]
+langchain = ["langchain>=0.1.0"]
+llamaindex = ["llamaindex>=0.9.0"]
+qdrant = ["qdrant-client>=1.7.0"]
+weaviate = ["weaviate-client>=4.0.0"]
+adapters = [
+    "langchain>=0.1.0",
+    "llamaindex>=0.9.0",
+    "qdrant-client>=1.7.0",
+    "weaviate-client>=4.0.0",
+]
+dev = ["pytest>=7.4.0", "pytest-asyncio>=0.21.0", "black>=23.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/Das-rebel/a3m-router"

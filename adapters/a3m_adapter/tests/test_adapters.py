@@ -18,73 +18,75 @@ sys.path.insert(0, '.')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def test_langchain_adapter():
     """Test LangChain adapter."""
     print("Testing LangChain adapter...")
     
     try:
-        from a3m_llm_adapter import A3MChatModel
+        from a3m_adapter import A3MLangChainAdapter
         
         # Initialize
-        llm = A3MChatModel(model="auto", temperature=0.7)
-        print(f"��✅ Initialized: {llm}")
+        llm = A3MLangChainAdapter(model="auto", temperature=0.7)
+        print(f"✅ Initialized: {llm}")
         
         # Test simple generation
         # Note: This would make actual API calls - we'll skip for now
         # In a real test, we'd mock the A3M router
-        print("��✅ LangChain adapter structure OK")
-        return True
+        print("✅ LangChain adapter structure OK")
+        assert llm is not None
         
     except Exception as e:
-        print(f"��❌ LangChain adapter failed: {e}")
-        return False
+        print(f"❌ LangChain adapter failed: {e}")
+        raise
+
 
 def test_llamaindex_adapter():
     """Test LlamaIndex adapter."""
     print("Testing LlamaIndex adapter...")
     
     try:
-        from a3m_llama_index_adapter import A3MLlamaIndexLLM
+        from a3m_adapter import A3MLlamaIndexAdapter
         
         # Initialize
-        llm = A3MLlamaIndexLLM(model="auto", temperature=0.5)
-        print(f"��✅ Initialized: {llm}")
+        llm = A3MLlamaIndexAdapter(model="auto", temperature=0.5)
+        print(f"✅ Initialized: {llm}")
         
         # Check metadata
         metadata = llm.metadata
-        print(f"��✅ Metadata: {metadata.model_name}, tokens: {metadata.num_output}")
-        return True
+        print(f"✅ Metadata: {metadata}")
+        assert metadata is not None
         
     except Exception as e:
-        print(f"��❌ LlamaIndex adapter failed: {e}")
-        return False
+        print(f"❌ LlamaIndex adapter failed: {e}")
+        raise
+
 
 def test_config():
     """Test configuration."""
     print("Testing configuration...")
     
     try:
-        from a3m_adapter_config import A3MConfig
+        from a3m_adapter import A3MConfig
         
         # Test defaults
         config = A3MConfig()
-        print(f"��✅ Default config: model={config.model}")
+        print(f"✅ Default config: model={config.model}")
         
         # Test to_dict
         data = config.to_dict()
         assert 'model' in data
-        print("��✅ Config to_dict works")
+        print("✅ Config to_dict works")
         
         # Test JSON serialization
         json_str = config.to_json()
         assert '"model"' in json_str
-        print("��✅ Config JSON serialization works")
-        
-        return True
+        print("✅ Config JSON serialization works")
         
     except Exception as e:
-        print(f"��❌ Config test failed: {e}")
-        return False
+        print(f"❌ Config test failed: {e}")
+        raise
+
 
 def main():
     """Run all tests."""
@@ -102,19 +104,15 @@ def main():
     total = len(tests)
     
     for test in tests:
-        if test():
-            passed += 1
+        test()
+        passed += 1
         print()
     
     print("=" * 50)
     print(f"Results: {passed}/{total} tests passed")
-    
-    if passed == total:
-        print("���🎉 All tests passed!")
-        return 0
-    else:
-        print("��❌ Some tests failed")
-        return 1
+    print("🎉 All tests passed!")
+    return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

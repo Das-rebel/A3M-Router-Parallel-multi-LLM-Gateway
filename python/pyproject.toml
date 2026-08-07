@@ -25,13 +25,28 @@ adapters = [
 dev = ["pytest>=7.4.0", "pytest-asyncio>=0.21.0", "black>=23.0.0"]
 
 keywords = [
-    "llm", "routing", "openai", "proxy", "ai-gateway", "routellm", "litellm",
-    "multi-llm", "model-selection", "cost-optimization", "langchain", "llamaindex",
-    "rag", "vector-search", "embeddings", "parallel", "ensemble", "router",
+    "llm",
+    "routing",
+    "openai",
+    "proxy",
+    "ai-gateway",
+    "routellm",
+    "litellm",
+    "multi-llm",
+    "model-selection",
+    "cost-optimization",
+    "langchain",
+    "llamaindex",
+    "rag",
+    "vector-search",
+    "embeddings",
+    "parallel",
+    "ensemble",
+    "router",
 ]
 
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 4 :: Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",

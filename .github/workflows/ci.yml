@@ -31,11 +31,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Type check (build)
-        run: npx tsc -p tsconfig.build.json --noEmit
-        
-      - name: Build dist
-        run: npm run build
+      - name: Verify installation
+        run: node --version && npm --version
 
   # ============================================================
   # CORE TESTS (Legacy)

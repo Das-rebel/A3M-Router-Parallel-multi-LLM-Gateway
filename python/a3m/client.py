@@ -188,3 +188,8 @@ class A3MRouter:
 
     async def __aexit__(self, *args):
         await self.close()
+
+
+class A3MRouterError(Exception):
+    """Base exception for A3MRouter errors."""
+    pass

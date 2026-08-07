@@ -1,101 +1,128 @@
 # A3M Router Python SDK
 
-Python SDK for the A3M Router — an intelligent LLM routing proxy that selects the best model for each query based on complexity, cost, and capability.
+**Intelligent LLM routing — auto-selects the cheapest capable model from 47+ providers.**
 
-## Install
+Routes queries to the best model for your needs — whether it's Groq for simple Q&A ($0.001/1K) or GPT-4o for complex reasoning ($0.15/1K).
+
+## Installation
 
 ```bash
 pip install a3m-router
 ```
 
-Requires Python 3.8+. Only dependency: `httpx`.
-
 ## Quick Start
 
-### Async Client (recommended)
-
 ```python
-import asyncio
 from a3m import A3MRouter
 
-async def main():
-    async with A3MRouter() as router:
-        # Chat with automatic model routing
-        response = await router.chat("What is 2+2?")
-        print(response["choices"][0]["message"]["content"])
+router = A3MRouter(base_url="http://localhost:8787")
 
-        # Check routing decision without executing
-        decision = await router.route("Write a Python web scraper")
-        print(decision)  # RoutingDecision(model=groq/llama-3.3-70b, tier=cheap, cost=$0.000000, complexity=0.35)
+# Auto-routes to optimal provider
+response = await router.chat("What is 2+2?")
+# → Routes to Groq, costs ~$0.000001
 
-        # Stream a response
-        async for token in router.stream_chat("Tell me a joke"):
-            print(token, end="", flush=True)
+# See routing decision before executing
+decision = await router.route("Explain quantum computing")
+print(f"Model: {decision.model}")
+print(f"Tier: {decision.tier}")
+print(f"Cost: ${decision.cost:.6f}")
 
-        # List available models
-        models = await router.models()
-
-        # Get cost analytics
-        report = await router.cost_report()
-        print(f"Total requests: {report.total_requests}")
-        print(f"Savings: {report.savings_percentage:.1f}%")
-
-asyncio.run(main())
+# Stream responses
+async for token in router.stream_chat("Tell me a story"):
+    print(token, end="", flush=True)
 ```
 
-### Sync Client
+## Key Features
 
-```python
-from a3m.sync_client import A3MRouterSync
+- **Auto-routing**: Picks the right model based on query complexity, budget, and requirements
+- **Cost savings**: 70-95% cheaper than always using premium models
+- **47+ providers**: Groq, DeepSeek, GPT-4o, Claude, Mistral, and more
+- **Framework adapters**: Drop-in for LangChain, LlamaIndex, Qdrant, Weaviate
+- **Health monitoring**: Check provider status and availability
+- **Cost analytics**: Track spending and savings
 
-with A3MRouterSync() as router:
-    response = router.chat("What is 2+2?")
-    print(response["choices"][0]["message"]["content"])
+## Framework Adapters
 
-    decision = router.route("Explain quantum computing")
-    print(f"Routed to {decision.model} (tier={decision.tier}, cost=${decision.cost:.6f})")
+| Adapter | Use Case | Install |
+|---------|----------|---------|
+| **LangChain** | Chain-based AI workflows | `pip install a3m-router[langchain]` |
+| **LlamaIndex** | RAG and document QA | `pip install a3m-router[llamaindex]` |
+| **Qdrant** | Vector search + RAG | `pip install a3m-router[qdrant]` |
+| **Weaviate** | Vector search + RAG | `pip install a3m-router[weaviate]` |
+
+All adapters:
+```bash
+pip install a3m-router[all]
 ```
 
-### With OpenAI SDK
+## Routing Tiers
 
-The router is OpenAI-compatible, so you can use the standard OpenAI SDK:
-
-```python
-from openai import AsyncOpenAI
-
-client = AsyncOpenAI(base_url="http://localhost:8787/v1", api_key="not-needed")
-response = await client.chat.completions.create(
-    model="auto",
-    messages=[{"role": "user", "content": "Hello"}]
-)
-```
+| Tier | Providers | Cost | When Used |
+|------|-----------|------|-----------|
+| **free** | Ollama, vLLM | $0 | Local inference |
+| **cheap** | Groq, DeepSeek | ~$0.001/1K | Simple Q&A, short code |
+| **mid** | GPT-4o-mini, Claude-haiku | ~$0.01/1K | Standard tasks |
+| **premium** | GPT-4o, Claude-sonnet | ~$0.15/1K | Complex reasoning |
 
 ## API Reference
 
-### A3MRouter (async)
+### A3MRouter
+
+```python
+router = A3MRouter(
+    base_url="http://localhost:8787",  # A3M Router server URL
+    timeout=30.0,                       # Request timeout
+)
+```
 
 | Method | Description |
 |--------|-------------|
-| `chat(message, model="auto", max_tokens=100, temperature=0.7, system=None)` | Send a chat message with automatic routing |
-| `route(query)` | Get routing decision without executing |
+| `chat(message)` | Send chat message with auto-routing |
+| `route(query)` | Get routing decision (no execution) |
 | `route_batch(queries)` | Route multiple queries |
-| `stream_chat(message, model="auto", max_tokens=100)` | Stream response tokens |
-| `models()` | List available models |
-| `health()` | Check router health |
-| `cost_report()` | Get cost analytics |
+| `stream_chat(message)` | Stream response tokens |
+| `models()` | List all available models |
+| `health()` | Provider health status |
+| `cost_report()` | Cost analytics |
 
-### RoutingDecision
+### LangChain Example
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `model` | str | Selected model name |
-| `tier` | str | Cost tier (free/cheap/mid/premium) |
-| `cost` | float | Estimated cost per request |
-| `complexity` | float | Query complexity score (0-1) |
-| `reasoning` | str | Why this model was chosen |
-| `fallback_models` | list | Alternative models if primary fails |
-| `is_free` | bool | Property — True if cost is $0 |
-| `is_expert` | bool | Property — True if complexity >= 0.65 |
+```python
+from a3m import LangChainAdapter
+from langchain.schema import HumanMessage
+
+llm = LangChainAdapter(base_url="http://localhost:8787")
+response = llm([HumanMessage(content="What is RAG?")])
+```
+
+### LlamaIndex Example
+
+```python
+from a3m import LlamaIndexAdapter
+
+llm = LlamaIndexAdapter()
+response = llm.complete("Explain transformers")
+```
+
+## Server Setup
+
+Start the A3M Router server:
+
+```bash
+# Via npm
+npx a3m-router serve
+
+# Via Docker
+docker-compose up -d
+```
+
+Server runs on `http://localhost:8787` by default.
+
+## Links
+
+- **GitHub**: https://github.com/Das-rebel/a3m-router
+- **npm Package**: https://www.npmjs.com/package/adaptive-memory-multi-model-router
+- **Documentation**: https://das-rebel.github.io/a3m-router
 
 ## License
 

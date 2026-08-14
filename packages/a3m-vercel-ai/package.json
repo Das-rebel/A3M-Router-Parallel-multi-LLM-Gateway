@@ -1,5 +1,5 @@
 {
-  "name": "@a3m/vercel-ai",
+  "name": "a3m-vercel-ai",
   "version": "0.1.0",
   "description": "A3M Router provider for Vercel AI SDK - intelligent cost-based routing with parallel execution",
   "license": "MIT",

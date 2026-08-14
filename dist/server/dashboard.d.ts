@@ -56,4 +56,3 @@ export declare function registerProvider(id: string, name: string): void;
  */
 export declare function handleDashboardRequest(req: http.IncomingMessage, res: http.ServerResponse): boolean;
 export declare function getDashboardHTML(): string;
-//# sourceMappingURL=dashboard.d.ts.map

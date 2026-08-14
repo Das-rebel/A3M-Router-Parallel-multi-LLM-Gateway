@@ -1,4 +1,4 @@
-# @a3m/vercel-ai
+# a3m-vercel-ai
 
 **A3M Router provider for Vercel AI SDK** — intelligent cost-based routing with parallel execution, automatic fallback, and 60%+ cost savings.
 
@@ -14,13 +14,13 @@
 ## Installation
 
 ```bash
-npm install @a3m/vercel-ai ai
+npm install a3m-vercel-ai ai
 ```
 
 ## Quick Start
 
 ```typescript
-import { createA3MProvider } from '@a3m/vercel-ai';
+import { createA3MProvider } from 'a3m-vercel-ai';
 import { generateText } from 'ai';
 
 const a3m = createA3MProvider();
@@ -40,25 +40,25 @@ console.log(result.text);
 const a3m = createA3MProvider({
   // A3M Router endpoint (default: http://localhost:8787)
   baseURL: process.env.A3M_ROUTER_URL || 'http://localhost:8787',
-  
+
   // API key (default: 'not-needed' for local)
   apiKey: process.env.A3M_API_KEY,
-  
+
   // Enable parallel ensemble execution
   parallelEnsemble: true,
-  
+
   // Number of providers to run in parallel (default: 3)
   parallelCount: 3,
-  
+
   // Enable stealth mode for browser automation
   stealth: false,
-  
+
   // Cache configuration
   cache: {
     enabled: true,
     ttl: 3600, // 1 hour
   },
-  
+
   // Provider API keys (if not using environment variables)
   providers: {
     openai: { apiKey: process.env.OPENAI_API_KEY },
@@ -72,7 +72,7 @@ const a3m = createA3MProvider({
 
 ```typescript
 // app/api/chat/route.ts
-import { createA3MProvider } from '@a3m/vercel-ai';
+import { createA3MProvider } from 'a3m-vercel-ai';
 import { streamText } from 'ai';
 
 const a3m = createA3MProvider({

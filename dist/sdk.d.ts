@@ -133,4 +133,3 @@ export declare class A3MRouter {
  * @returns Configured A3MRouter instance
  */
 export declare function createSDK(config?: A3MRouterConfig): A3MRouter;
-//# sourceMappingURL=sdk.d.ts.map

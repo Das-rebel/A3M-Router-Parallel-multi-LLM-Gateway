@@ -8,4 +8,3 @@ import * as http from 'http';
 import { RouteContext } from '../router';
 export declare function handleChatCompletions(req: http.IncomingMessage, res: http.ServerResponse, ctx: RouteContext): Promise<void>;
 export default handleChatCompletions;
-//# sourceMappingURL=chatHandler.d.ts.map

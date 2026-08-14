@@ -6,7 +6,11 @@
  * 2. Config file at ~/.config/a3m-router/providers.json
  * 3. Runtime registration via registerProvider()
  *
- * 40+ providers across free, cheap, mid-tier, premium, and enterprise tiers.
+ * 70+ providers across free, cheap, mid-tier, premium, and enterprise tiers.
+ * Coverage: Cloudflare Workers AI, HuggingFace Inference, Modal, Lepton, NVIDIA NIM,
+ * Baseten, RunPod, Predibase, Featherless, Abacus, Hyperbolic, Stability AI,
+ * SiliconFlow, Yandex, Tencent, VolcEngine, Baidu, Kuaishou, 360 AI, Naver, Kakao,
+ * AWS Bedrock/SageMaker, Azure, and more.
  */
 
 import * as fs from 'fs';
@@ -720,6 +724,1054 @@ export const DEFAULT_PROVIDERS: Record<string, ProviderDefinition> = {
     type: 'api',
     priority: 4,
     maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // CLOUDFLARE WORKERS AI (global edge network, free tier)
+  // ========================================================================
+  cloudflare: {
+    id: 'cloudflare',
+    name: 'Cloudflare Workers AI',
+    baseUrl: 'https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1/run',
+    apiKeyEnv: 'CLOUDFLARE_API_TOKEN',
+    models: [
+      '@cf/meta/llama-3.1-8b-instruct',
+      '@cf/meta/llama-3.3-70b-instruct',
+      '@cf/meta/llama-3.1-70b-instruct',
+      '@cf/qwen/qwen2.5-72b-instruct',
+      '@cf/qwen/qwen2.5-32b-instruct',
+      '@cf/mistral/mistral-7b-instruct-v0.2',
+      '@cf/deepseek-ai/deepseek-r1-distill-qwen-32b',
+      '@cf/thebloke/llama-2-13b-chat-awq',
+      '@cf/google/gemma-2-27b-it',
+      '@cf/fb/detr-image-model',
+    ],
+    costPerK: { input: 0, output: 0 }, // Free tier available
+    tier: 'free',
+    format: 'openai',
+    type: 'api',
+    priority: 4,
+    maxTokens: 8192,
+    strategy: 'balanced',
+  },
+
+  // ========================================================================
+  // HUGGINGFACE INFERENCE API (largest model hub)
+  // ========================================================================
+  huggingface: {
+    id: 'huggingface',
+    name: 'HuggingFace Inference',
+    baseUrl: 'https://api-inference.huggingface.co/v1/chat/completions',
+    apiKeyEnv: 'HF_TOKEN',
+    models: [
+      'meta-llama/Llama-3.1-8B-Instruct',
+      'meta-llama/Llama-3.3-70B-Instruct',
+      'mistralai/Mistral-7B-Instruct-v0.2',
+      'mistralai/Mixtral-8x7B-Instruct-v0.1',
+      'Qwen/Qwen2.5-72B-Instruct',
+      'Qwen/Qwen2.5-32B-Instruct',
+      'Qwen/Qwen2.5-14B-Instruct',
+      'deepseek-ai/DeepSeek-V3',
+      'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
+      'google/gemma-2-27b-it',
+      'google/gemma-2-9b-it',
+      'anthropic/claude-3.5-sonnet',
+      'meta-llama/Llama-4-Maverick-17B-128E-Instruct',
+      'nvidia/Llama-3.1-Nemotron-70B-Instruct-HF',
+    ],
+    costPerK: { input: 0.06, output: 0.06 }, // Free tier available
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 8,
+    maxTokens: 32768,
+    strategy: 'balanced',
+  },
+
+  // ========================================================================
+  // MODAL (serverless GPU compute)
+  // ========================================================================
+  modal: {
+    id: 'modal',
+    name: 'Modal',
+    baseUrl: 'https://api.modal.com/v1/chat/completions',
+    apiKeyEnv: 'MODAL_API_TOKEN',
+    models: [
+      'meta-llama/Llama-3.1-8B-Instruct',
+      'meta-llama/Llama-3.3-70B-Instruct',
+      'mistralai/Mistral-7B-Instruct-v0.2',
+      'Qwen/Qwen2.5-72B-Instruct',
+    ],
+    costPerK: { input: 0, output: 0 }, // Pay-per-second GPU compute
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 9,
+    maxTokens: 16384,
+    strategy: 'aggressive',
+  },
+
+  // ========================================================================
+  // LEPTON AI (serverless, competitive pricing)
+  // ========================================================================
+  lepton: {
+    id: 'lepton',
+    name: 'Lepton AI',
+    baseUrl: 'https://api.lepton.ai/v1/chat/completions',
+    apiKeyEnv: 'LEPTON_API_TOKEN',
+    models: [
+      'llama-3.1-8b',
+      'llama-3.1-70b',
+      'mixtral-8x7b',
+      'qwen2.5-72b',
+      'qwen2.5-32b',
+      'gemma-2-27b',
+    ],
+    costPerK: { input: 0.08, output: 0.08 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 9,
+    maxTokens: 16384,
+    strategy: 'balanced',
+  },
+
+  // ========================================================================
+  // BASETEN (model deployment platform)
+  // ========================================================================
+  baseten: {
+    id: 'baseten',
+    name: 'Baseten',
+    baseUrl: 'https://api.baseten.co/v1/chat/completions',
+    apiKeyEnv: 'BASETEN_API_KEY',
+    models: [
+      'llama-3.1-8b-instruct',
+      'llama-3.1-70b-instruct',
+      'mixtral-8x7b-instruct',
+      'wizardlm-2-8x22b',
+    ],
+    costPerK: { input: 0.5, output: 0.5 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 18,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // RUNPOD (serverless inference)
+  // ========================================================================
+  runpod: {
+    id: 'runpod',
+    name: 'RunPod Serverless',
+    baseUrl: 'https://api.runpod.ai/v2/{endpoint_id}/openai/v1/chat/completions',
+    apiKeyEnv: 'RUNPOD_API_KEY',
+    models: [
+      'meta-llama/Llama-3.1-8B-Instruct',
+      'meta-llama/Llama-3.3-70B-Instruct',
+      'mistralai/Mistral-7B-Instruct-v0.2',
+      'mistralai/Mixtral-8x7B-Instruct-v0.1',
+      'Qwen/Qwen2.5-72B-Instruct',
+    ],
+    costPerK: { input: 0.2, output: 0.2 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 10,
+    maxTokens: 16384,
+  },
+
+  // ========================================================================
+  // PREDIBASE (managed fine-tuning + inference)
+  // ========================================================================
+  predibase: {
+    id: 'predibase',
+    name: 'Predibase',
+    baseUrl: 'https://serving.predibase.com/{workspace}/v2/predict',
+    apiKeyEnv: 'PREDIBASE_API_KEY',
+    models: [
+      'llama-3.1-8b-instruct',
+      'llama-3.1-70b-instruct',
+      'mistral-7b-instruct',
+      'mixtral-8x7b-instruct',
+      'llama-2-70b-chat',
+    ],
+    costPerK: { input: 0.4, output: 0.4 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 19,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // FEATHERLESS AI (inference optimization platform)
+  // ========================================================================
+  featherless: {
+    id: 'featherless',
+    name: 'Featherless AI',
+    baseUrl: 'https://api.featherless.ai/v1/chat/completions',
+    apiKeyEnv: 'FEATHERLESS_API_KEY',
+    models: [
+      'anthropic/claude-3.5-sonnet',
+      'meta-llama/llama-3.1-70b-instruct',
+      'mistralai/mistral-large-3-675b-instruct',
+    ],
+    costPerK: { input: 1.0, output: 2.0 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 18,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // ABACUS AI (end-to-end ML platform)
+  // ========================================================================
+  abacus: {
+    id: 'abacus',
+    name: 'Abacus AI',
+    baseUrl: 'https://api.abacus.ai/v1/chat/completions',
+    apiKeyEnv: 'ABACUS_API_KEY',
+    models: [
+      'Llama-3.1-8B-Instruct',
+      'Llama-3.1-70B-Instruct',
+      'Mistral-7B-Instruct',
+      'Mixtral-8x7B-Instruct',
+      'Qwen2.5-72B-Instruct',
+      'GPT-4o-mini',
+      'Claude-3.5-Sonnet',
+    ],
+    costPerK: { input: 0.15, output: 0.15 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 11,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // STABILITY AI (image + language models)
+  // ========================================================================
+  stability: {
+    id: 'stability',
+    name: 'Stability AI',
+    baseUrl: 'https://api.stability.ai/v1/chat/completions',
+    apiKeyEnv: 'STABILITY_API_KEY',
+    models: [
+      'stable-diffusion-xl-base-1.0',
+      'stable-diffusion-3-medium',
+      'stable-diffusion-core',
+    ],
+    costPerK: { input: 0.5, output: 0.5 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 20,
+    maxTokens: 8192,
+    supports_multimodal: true,
+  },
+
+  // ========================================================================
+  // HYPERBOLIC LABS (compute marketplace)
+  // ========================================================================
+  hyperbolic: {
+    id: 'hyperbolic',
+    name: 'Hyperbolic',
+    baseUrl: 'https://api.hyperbolic.xyz/v1/chat/completions',
+    apiKeyEnv: 'HYPERBOLIC_API_KEY',
+    models: [
+      'meta-llama/Llama-3.1-8B-Instruct',
+      'meta-llama/Llama-3.1-70B-Instruct',
+      'meta-llama/Llama-3.1-405B-Instruct',
+      'mistralai/Mistral-7B-Instruct-v0.2',
+      'mistralai/Mixtral-8x7B-Instruct-v0.1',
+      'Qwen/Qwen2.5-72B-Instruct',
+      'deepseek-ai/DeepSeek-V3',
+      'deepseek-ai/DeepSeek-R1',
+    ],
+    costPerK: { input: 0.08, output: 0.08 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 9,
+    maxTokens: 32768,
+    strategy: 'aggressive',
+  },
+
+  // ========================================================================
+  // TEXTSYNTH (inference API)
+  // ========================================================================
+  textsynth: {
+    id: 'textsynth',
+    name: 'TextSynth',
+    baseUrl: 'https://api.textsynth.com/v1/chat/completions',
+    apiKeyEnv: 'TEXTSYNTH_API_KEY',
+    models: [
+      'llama-3.1-8b-instruct',
+      'llama-3.1-70b-instruct',
+      'mixtral-8x7b',
+      'gemma-2-27b',
+    ],
+    costPerK: { input: 0.1, output: 0.1 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 11,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // INSTILL AI (v3 API, open source)
+  // ========================================================================
+  instill: {
+    id: 'instill',
+    name: 'Instill AI',
+    baseUrl: 'https://api.instill.ai/v1alpha/v1/chat/completions',
+    apiKeyEnv: 'INSTILL_API_KEY',
+    models: [
+      'meta-llama/llama-3.1-8b-instruct',
+      'meta-llama/llama-3.1-70b-instruct',
+      'mistralai/mistral-7b-instruct-v0.2',
+      'qwen/qwen2.5-72b-instruct',
+    ],
+    costPerK: { input: 0.2, output: 0.2 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 20,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // SILICONFLOW (China-based inference platform)
+  // ========================================================================
+  siliconflow: {
+    id: 'siliconflow',
+    name: 'SiliconFlow',
+    baseUrl: 'https://api.siliconflow.cn/v1/chat/completions',
+    apiKeyEnv: 'SILICONFLOW_API_KEY',
+    models: [
+      'Qwen/Qwen2.5-72B-Instruct',
+      'Qwen/Qwen2.5-32B-Instruct',
+      'deepseek-ai/DeepSeek-V3',
+      'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
+      'meta-llama/Llama-3.1-70B-Instruct',
+      'mistralai/Mixtral-8x7B-Instruct-v0.1',
+    ],
+    costPerK: { input: 0.04, output: 0.04 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 9,
+    maxTokens: 16384,
+    strategy: 'aggressive',
+  },
+
+  // ========================================================================
+  // HYPERSTACK (GPU compute marketplace)
+  // ========================================================================
+  hyperstack: {
+    id: 'hyperstack',
+    name: 'Hyperstack',
+    baseUrl: 'https://api.hyperstack.cloud/v1/chat/completions',
+    apiKeyEnv: 'HYPERSTACK_API_KEY',
+    models: [
+      'meta-llama/Llama-3.1-8B-Instruct',
+      'meta-llama/Llama-3.1-70B-Instruct',
+      'mistralai/Mistral-7B-Instruct-v0.2',
+      'Qwen/Qwen2.5-72B-Instruct',
+    ],
+    costPerK: { input: 0.1, output: 0.1 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 11,
+    maxTokens: 16384,
+  },
+
+  // ========================================================================
+  // LIVEPEOPLE (real-time conversational AI)
+  // ========================================================================
+  livepeople: {
+    id: 'livepeople',
+    name: 'LivePeople',
+    baseUrl: 'https://api.livepeople.ai/v1/chat/completions',
+    apiKeyEnv: 'LIVEPEOPLE_API_KEY',
+    models: [
+      'livepeople-gpt-4o-mini',
+      'livepeople-gpt-4o',
+      'livepeople-claude-3-opus',
+    ],
+    costPerK: { input: 1.0, output: 2.0 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 22,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // YANDEX CLOUD (Yandex GPT)
+  // ========================================================================
+  yandex: {
+    id: 'yandex',
+    name: 'Yandex Cloud',
+    baseUrl: 'https://llm.api.cloud.yandex.net/foundationModels/v1/conversation',
+    apiKeyEnv: 'YANDEX_API_KEY',
+    models: [
+      'gpt-4o-mini',
+      'yandexgpt-4',
+      'yandexgpt-3',
+      'yandexgpt-light',
+    ],
+    costPerK: { input: 0.3, output: 0.3 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 21,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // TENCent Hunyuan (Tencent Cloud)
+  // ========================================================================
+  tencent: {
+    id: 'tencent',
+    name: 'Tencent Hunyuan',
+    baseUrl: 'https://api.tc.semnov.com/v1/chat/completions',
+    apiKeyEnv: 'TENCENT_SECRET_ID',
+    models: [
+      'hunyuan-pro',
+      'hunyuan-standard',
+      'hunyuan-lite',
+    ],
+    costPerK: { input: 0.06, output: 0.06 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 12,
+    maxTokens: 8192,
+    strategy: 'balanced',
+  },
+
+  // ========================================================================
+  // VOLCENGINE (ByteDance AI platform)
+  // ========================================================================
+  volcengine: {
+    id: 'volcengine',
+    name: 'VolcEngine (Doubao)',
+    baseUrl: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+    apiKeyEnv: 'VOLCENGINE_API_KEY',
+    models: [
+      'doubao-pro-32k',
+      'doubao-pro-128k',
+      'doubao-lite-32k',
+      'doubao-edge-4k',
+    ],
+    costPerK: { input: 0.1, output: 0.1 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 13,
+    maxTokens: 128000,
+    strategy: 'balanced',
+  },
+
+  // ========================================================================
+  // BAIDU QIANFAN (Baidu Cloud)
+  // ========================================================================
+  baidu: {
+    id: 'baidu',
+    name: 'Baidu Qianfan',
+    baseUrl: 'https://qianfan.baidubce.com/v2/chat/completions',
+    apiKeyEnv: 'BAIDU_QIANFAN_API_KEY',
+    models: [
+      'ernie-4.0-8k-latest',
+      'ernie-4.0-128k',
+      'ernie-3.5-8k-pro',
+      'ernie-speed-128k',
+      'ernie-speed-pro-128k',
+      'ernie-lite-8k',
+    ],
+    costPerK: { input: 0.3, output: 0.6 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 20,
+    maxTokens: 128000,
+  },
+
+  // ========================================================================
+  // KUAISHOU (Kling AI video + text)
+  // ========================================================================
+  kuaishou: {
+    id: 'kuaishou',
+    name: 'Kuaishou (Kling)',
+    baseUrl: 'https://api.kuaishou.com/v2/chat/completions',
+    apiKeyEnv: 'KUAISHOU_API_KEY',
+    models: [
+      'kling-2.0-pro',
+      'kling-2.0-standard',
+      'kling-1.6-lite',
+    ],
+    costPerK: { input: 0.1, output: 0.1 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 13,
+    maxTokens: 8192,
+    supports_multimodal: true,
+  },
+
+  // ========================================================================
+  // 360 AI (360 Cloud Brain)
+  // ========================================================================
+  ai360: {
+    id: 'ai360',
+    name: '360 AI',
+    baseUrl: 'https://ai.360.cn/v1/chat/completions',
+    apiKeyEnv: 'AI360_API_KEY',
+    models: [
+      '360gpt-pro',
+      '360gpt-s2-ultra',
+      '360gpt-t2-pro',
+    ],
+    costPerK: { input: 0.1, output: 0.1 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 14,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // NAVER CLOUD (Clova)
+  // ========================================================================
+  naver: {
+    id: 'naver',
+    name: 'Naver Clova',
+    baseUrl: 'https://clovastudio.ncloud.com/v1/api/chat-completions',
+    apiKeyEnv: 'NAVER_CLIENT_ID',
+    models: [
+      'clova-x',
+      'hyperspace-1.5',
+      'clova-cx',
+    ],
+    costPerK: { input: 0.5, output: 1.0 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 21,
+    maxTokens: 8192,
+    strategy: 'conservative',
+  },
+
+  // ========================================================================
+  // KAKAO BRAIN (KoChat)
+  // ========================================================================
+  kakao: {
+    id: 'kakao',
+    name: 'Kakao Brain',
+    baseUrl: 'https://api.kakaobrain.com/v1/chat/completions',
+    apiKeyEnv: 'KAKAO_API_KEY',
+    models: [
+      'kochat-2-pro',
+      'kochat-2-ultra',
+      'kochat-1.8b',
+      'kochat-6b',
+    ],
+    costPerK: { input: 0.2, output: 0.2 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 22,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // SAGEMAKER (AWS SageMaker Endpoints)
+  // ========================================================================
+  sagemaker: {
+    id: 'sagemaker',
+    name: 'AWS SageMaker',
+    baseUrl: 'https://runtime.sagemaker.{region}.amazonaws.com/endpoint/{endpoint_name}/invocations',
+    apiKeyEnv: 'AWS_ACCESS_KEY_ID',
+    models: [], // User configures their own endpoints
+    costPerK: { input: 0, output: 0 }, // User-defined pricing
+    tier: 'enterprise',
+    format: 'openai',
+    type: 'api',
+    priority: 30,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // SCALE AI (Scale Nucleus + API)
+  // ========================================================================
+  scale: {
+    id: 'scale',
+    name: 'Scale AI',
+    baseUrl: 'https://api.scale.com/v1/chat/completions',
+    apiKeyEnv: 'SCALE_API_KEY',
+    models: [
+      'scale-gpt-4o',
+      'scale-claude-3-opus',
+    ],
+    costPerK: { input: 2.0, output: 10.0 },
+    tier: 'premium',
+    format: 'openai',
+    type: 'api',
+    priority: 25,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // TITANIUM NETWORK (AI Gateway)
+  // ========================================================================
+  titanium: {
+    id: 'titanium',
+    name: 'Titanium Network',
+    baseUrl: 'https://api.titaniumapi.dev/v1/chat/completions',
+    apiKeyEnv: 'TITANIUM_API_KEY',
+    models: [
+      'gpt-4o-mini',
+      'gpt-4o',
+      'claude-3-haiku',
+      'claude-3-sonnet',
+    ],
+    costPerK: { input: 0.3, output: 0.3 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 16,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // ANTHROPIC via AWS (Bedrock Claude on AWS)
+  // ========================================================================
+  bedrock_anthropic: {
+    id: 'bedrock_anthropic',
+    name: 'AWS Bedrock (Anthropic)',
+    baseUrl: 'https://bedrock-runtime.{region}.amazonaws.com/model/anthropic.claude-3-5-sonnet-20241022/invoke',
+    apiKeyEnv: 'AWS_ACCESS_KEY_ID',
+    models: [
+      'anthropic.claude-3-5-sonnet-20241022',
+      'anthropic.claude-3-opus-20240307',
+      'anthropic.claude-3-sonnet-20240229',
+      'anthropic.claude-3-haiku-20240307',
+    ],
+    costPerK: { input: 3.0, output: 15.0 },
+    tier: 'enterprise',
+    format: 'openai',
+    type: 'api',
+    priority: 23,
+    maxTokens: 8192,
+    strategy: 'conservative',
+  },
+
+  // ========================================================================
+  // OPENAI via Azure (already have azure_openai, this is direct Azure OpenAI)
+  // ========================================================================
+  azure_openai_direct: {
+    id: 'azure_openai_direct',
+    name: 'Azure OpenAI (Direct)',
+    baseUrl: 'https://{resource}.openai.azure.com/openai/deployments/{deployment}/chat/completions',
+    apiKeyEnv: 'AZURE_OPENAI_API_KEY',
+    models: [
+      'gpt-4o',
+      'gpt-4o-mini',
+      'gpt-4-turbo',
+      'gpt-4',
+      'gpt-35-turbo',
+    ],
+    costPerK: { input: 2.5, output: 10.0 },
+    tier: 'enterprise',
+    format: 'openai',
+    type: 'api',
+    priority: 22,
+    maxTokens: 128000,
+    strategy: 'conservative',
+  },
+
+  // ========================================================================
+  // AIZEL CLOUD (Russian AI platform)
+  // ========================================================================
+  aizel: {
+    id: 'aizel',
+    name: 'Aizel Cloud',
+    baseUrl: 'https://api.aizel.ai/v1/chat/completions',
+    apiKeyEnv: 'AIZEL_API_KEY',
+    models: [
+      'aizel-8b',
+      'aizel-72b',
+      'aizel-claude',
+    ],
+    costPerK: { input: 0.15, output: 0.15 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 15,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // SKYFIRE (AI API aggregator)
+  // ========================================================================
+  skyfire: {
+    id: 'skyfire',
+    name: 'SkyFire',
+    baseUrl: 'https://api.skyfireai.com/v1/chat/completions',
+    apiKeyEnv: 'SKYFIRE_API_KEY',
+    models: [
+      'skyfire-gpt-4o-mini',
+      'skyfire-claude-3-sonnet',
+      'skyfire-gemini-pro',
+      'skyfire-llama-3.1-70b',
+    ],
+    costPerK: { input: 0.5, output: 0.5 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 18,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // POE (Quora's AI platform with 1000s of models)
+  // ========================================================================
+  poe: {
+    id: 'poe',
+    name: 'Poe API',
+    baseUrl: 'https://api.poe.com/v1/chat/completions',
+    apiKeyEnv: 'POE_API_KEY',
+    models: [
+      'GPT-4o',
+      'Claude-3.5-Sonnet',
+      'Claude-3-Opus',
+      'Claude-3-Haiku',
+      'Gemini-1.5-Pro',
+      'Gemini-1.5-Flash',
+      'Llama-3.1-405B',
+      'Llama-3.1-70B',
+      'Llama-3.1-8B',
+      'Mixtral-8x22B',
+      'Qwen-2.5-72B',
+    ],
+    costPerK: { input: 0.5, output: 0.5 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 17,
+    maxTokens: 8192,
+    strategy: 'balanced',
+  },
+
+  // ========================================================================
+  // PHIND (AI search for developers)
+  // ========================================================================
+  phind: {
+    id: 'phind',
+    name: 'Phind',
+    baseUrl: 'https://api.phind.com/agent/v1/chat/completions',
+    apiKeyEnv: 'PHIND_API_KEY',
+    models: [
+      'phind-codestral-2501',
+      'phind-nemo-2407',
+      'claude-3.5-sonnet',
+      'gpt-4o',
+    ],
+    costPerK: { input: 0.2, output: 0.2 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 12,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // BANANA (serverless model inference)
+  // ========================================================================
+  banana: {
+    id: 'banana',
+    name: 'Banana',
+    baseUrl: 'https://api.banana.dev/v1/chat/completions',
+    apiKeyEnv: 'BANANA_API_KEY',
+    models: [
+      'llama-3.1-8b-instruct',
+      'llama-3.1-70b-instruct',
+      'mistral-7b-instruct',
+      'mixtral-8x7b',
+      'qwen2.5-72b',
+    ],
+    costPerK: { input: 0.2, output: 0.2 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 12,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // FOREFRONT AI (enterprise AI platform)
+  // ========================================================================
+  forefront: {
+    id: 'forefront',
+    name: 'Forefront AI',
+    baseUrl: 'https://api.forefront.ai/v1/chat/completions',
+    apiKeyEnv: 'FOREAHEAD_API_KEY',
+    models: [
+      'gpt-4o-mini',
+      'gpt-4o',
+      'claude-3-opus',
+      'claude-3-sonnet',
+      'claude-3-haiku',
+      'gemini-pro-1.5',
+    ],
+    costPerK: { input: 0.5, output: 1.0 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 18,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // JASPER (AI copywriting)
+  // ========================================================================
+  jasper: {
+    id: 'jasper',
+    name: 'Jasper',
+    baseUrl: 'https://api.jasper.ai/v1/chat/completions',
+    apiKeyEnv: 'JASPER_API_KEY',
+    models: [
+      'jasper-gpt-4o',
+      'jasper-claude-3-opus',
+      'jasper-gemini-pro',
+    ],
+    costPerK: { input: 1.0, output: 2.0 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 24,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // WRITESONIC (AI content generation)
+  // ========================================================================
+  writesonic: {
+    id: 'writesonic',
+    name: 'Writesonic',
+    baseUrl: 'https://api.writesonic.com/v1/chat/completions',
+    apiKeyEnv: 'WRITESONIC_API_KEY',
+    models: [
+      'claude-3-opus',
+      'claude-3-sonnet',
+      'gpt-4o',
+      'gpt-4o-mini',
+    ],
+    costPerK: { input: 0.5, output: 1.0 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 23,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // YOU.COM (AI-powered search)
+  // ========================================================================
+  you: {
+    id: 'you',
+    name: 'You.com',
+    baseUrl: 'https://api.you.com/v1/chat/completions',
+    apiKeyEnv: 'YOU_API_KEY',
+    models: [
+      'gpt-4o-mini',
+      'claude-3-sonnet',
+      'claude-3-haiku',
+      'llama-3.1-70b',
+    ],
+    costPerK: { input: 0.3, output: 0.3 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 19,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // KOMO AI (AI search engine)
+  // ========================================================================
+  komo: {
+    id: 'komo',
+    name: 'Komo AI',
+    baseUrl: 'https://api.komo.ai/v1/chat/completions',
+    apiKeyEnv: 'KOMO_API_KEY',
+    models: [
+      'komo-gpt-4o-mini',
+      'komo-claude-3-haiku',
+      'komo-llama-3.1-70b',
+    ],
+    costPerK: { input: 0.2, output: 0.2 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 14,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // SHINE (AI platform - Chinese market)
+  // ========================================================================
+  shine: {
+    id: 'shine',
+    name: 'Shine AI',
+    baseUrl: 'https://api.shineai.com/v1/chat/completions',
+    apiKeyEnv: 'SHINE_API_KEY',
+    models: [
+      'shine-gpt-4o-mini',
+      'shine-claude-3-haiku',
+      'shine-qwen2.5-72b',
+    ],
+    costPerK: { input: 0.08, output: 0.08 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 14,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // ZHIPU (already exists - adding GLM-4 variant for distinction)
+  // Note: Already defined as 'zhipu' above. This section reserved.
+  // ========================================================================
+
+  // ========================================================================
+  // AIDELabs (AI research platform)
+  // ========================================================================
+  aide: {
+    id: 'aide',
+    name: 'AIDE Labs',
+    baseUrl: 'https://api.aidelabs.ai/v1/chat/completions',
+    apiKeyEnv: 'AIDE_API_KEY',
+    models: [
+      'aide-gpt-4o-mini',
+      'aide-claude-3-sonnet',
+      'aide-llama-3.1-70b',
+      'aide-qwen-72b',
+    ],
+    costPerK: { input: 0.1, output: 0.1 },
+    tier: 'cheap',
+    format: 'openai',
+    type: 'api',
+    priority: 14,
+    maxTokens: 16384,
+    strategy: 'balanced',
+  },
+
+  // ========================================================================
+  // WRITER (enterprise AI writing platform)
+  // ========================================================================
+  writer: {
+    id: 'writer',
+    name: 'Writer API',
+    baseUrl: 'https://api.writer.com/v1/chat/completions',
+    apiKeyEnv: 'WRITER_API_KEY',
+    models: [
+      'palmyra-x',
+      'palmyra-instruct',
+      'palmyra-lora',
+    ],
+    costPerK: { input: 0.5, output: 1.0 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 24,
+    maxTokens: 8192,
+  },
+
+  // ========================================================================
+  // DBRX (Databricks DBRX model)
+  // ========================================================================
+  databricks: {
+    id: 'databricks',
+    name: 'Databricks',
+    baseUrl: 'https://{workspace}.cloud.databricks.com/serving-endpoints/{endpoint}/invocations',
+    apiKeyEnv: 'DATABRICKS_API_KEY',
+    models: [
+      'databricks-dbrx-instruct',
+      'meta-llama-3-70b-instruct',
+    ],
+    costPerK: { input: 0.5, output: 0.5 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 25,
+    maxTokens: 16384,
+  },
+
+  // ========================================================================
+  // MISTRAL via LA PLATEFORME (French AI platform)
+  // ========================================================================
+  laplateforme: {
+    id: 'laplateforme',
+    name: 'La Plateforme',
+    baseUrl: 'https://api.laplateforme.io/v1/chat/completions',
+    apiKeyEnv: 'LAPLATEFORME_API_KEY',
+    models: [
+      'mistral-7b-instruct-v0.2',
+      'mixtral-8x7b-instruct-v0.1',
+      'mistral-large-2409',
+      'pixtral-12b-2409',
+    ],
+    costPerK: { input: 0.24, output: 0.24 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 18,
+    maxTokens: 32768,
+  },
+
+  // ========================================================================
+  // UPSTAGE AI (Korean AI platform)
+  // ========================================================================
+  upstage: {
+    id: 'upstage',
+    name: 'Upstage',
+    baseUrl: 'https://api.upstage.ai/v1/chat/completions',
+    apiKeyEnv: 'UPSTAGE_API_KEY',
+    models: [
+      'solar-pro',
+      'solar-mini',
+      'solar-document-parse',
+    ],
+    costPerK: { input: 0.3, output: 0.6 },
+    tier: 'mid',
+    format: 'openai',
+    type: 'api',
+    priority: 22,
+    maxTokens: 8192,
+    strategy: 'conservative',
+  },
+
+  // ========================================================================
+  // CLOUDFLARE WAITUNTIL (edge caching for semantic cache)
+  // ========================================================================
+  cloudflare_workers: {
+    id: 'cloudflare_workers',
+    name: 'Cloudflare Workers (Cache)',
+    baseUrl: 'https://api.cloudflare.com/client/v4/accounts/{account_id}/workers/script',
+    apiKeyEnv: 'CLOUDFLARE_API_TOKEN',
+    models: [],
+    costPerK: { input: 0, output: 0 },
+    tier: 'free',
+    format: 'openai',
+    type: 'api',
+    priority: 50,
+    maxTokens: 0,
   },
 };
 

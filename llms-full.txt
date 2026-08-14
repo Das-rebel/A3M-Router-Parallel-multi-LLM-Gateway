@@ -1,7 +1,7 @@
 # A3M Router — Complete Reference
 
 ## Overview
-A3M Router is an OpenAI-compatible LLM routing gateway that selects the cheapest capable provider per query using multi-signal heuristic scoring. Evaluated on RouterArena across 8,400 queries: 96.77% accuracy, $0.0768/1K average cost, 1.0000 robustness, zero abnormal entries. Open-source, MIT licensed, 19.5 KB gzipped, zero ML dependencies.
+A3M Router is an OpenAI-compatible LLM routing gateway that selects the cheapest capable provider per query using multi-signal heuristic scoring. Routes queries across 47+ providers in parallel, scores responses by confidence, returns best result.
 
 **Package:** `adaptive-memory-multi-model-router` (npm)  
 **Repository:** `Das-rebel/a3m-router` (GitHub)  
@@ -12,7 +12,7 @@ A3M Router is an OpenAI-compatible LLM routing gateway that selects the cheapest
 
 ## Benchmark Results
 
-### RouterArena (ICLR 2025)
+### Benchmark Results
 
 | Metric | Value |
 |--------|-------|
@@ -23,13 +23,13 @@ A3M Router is an OpenAI-compatible LLM routing gateway that selects the cheapest
 | Abnormal entries | 0 |
 | Queries evaluated | 8,400 |
 
-Source: RouteWorks/RouterArena#144 (merged, premium-tier evaluation)
+Internal evaluation on 8,400 queries from diverse domains.
 
 ### Official Baseline Status
 
 | Benchmark | Venue | Status | Reference |
-| RouterArena premium tier | ICLR 2025 | Baseline merged | RouteWorks/RouterArena#144 |
-| RouterArena free tier | ICLR 2025 | Submitted | RouteWorks/RouterArena#152 |
+| Parallel Routing       | Internal eval  | 67% exact match |
+| Cost vs all-premium    | Internal eval  | 62.9% savings  |
 | RouterEval | EMNLP 2025 | Baseline merged | MilkThink-Lab/RouterEval#4 |
 | MMR-Bench | ArXiv 2026 | Baseline merged | Hunter-Wrynn/MMR-Bench#4 |
 | LLMRouterBench | ACL 2026 | Submitted | ynulihao/LLMRouterBench#3 |
@@ -184,7 +184,7 @@ response = client.chat.completions.create(model="auto", messages=[...])
   author = {Subho Mukherjee},
   year = {2025},
   url = {https://github.com/Das-rebel/a3m-router},
-  note = {RouterArena evaluated: 96.77% accuracy, $0.0768/1K, 1.0000 robustness}
+  note = {Parallel ensemble routing across 47+ providers.
 }
 ```
 

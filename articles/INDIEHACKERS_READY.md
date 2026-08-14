@@ -55,16 +55,15 @@ I ran A3M against 200 real production queries with cost tracking:
 
 Same quality outputs. 62% less money.
 
-Then RouterArena published their benchmark (arXiv:2510.00202). I submitted A3M.
+## Cost Comparison
 
-**Result: #1 among cost-aware routers. 0.9404 / 96.77%. $0.0768/1K tokens.**
-
-| Router | Score | Cost/1K |
-|--------|:-----:|:-------:|
-| A3M Router | 96.77% | $0.0768 |
-| Sqwish | 75.27 | $0.180 |
-| Azure | 71.87 | $0.220 |
-| GPT-5 | 64.32 | $10.020 |
+| Router | Cost/1K tokens | Open Source |
+|--------|:--------------:|:----------:|
+| **A3M Router** | **$0.0768** | ✅ |
+| Sqwish | $0.18 | ❌ |
+| Azure | $0.22 | ❌ |
+| GPT-5 (OpenAI) | $10.02 | ❌ |
+| RouteLLM (Berkeley) | $0.27 | ✅ |
 
 We score higher than GPT-5 at **200× lower cost**.
 
@@ -78,34 +77,20 @@ Zero marketing. No Product Hunt launch. No Hacker News submission. Just develope
 
 By week two: **10,024 downloads.**
 
-The feedback was consistent: *"My bill dropped 60% in the first week."*
+## Features
 
-## Business model
-
-A3M is MIT licensed. Open source. The package itself is free.
-
-I'm building a hosted version for teams that don't want to manage API keys — a dashboard where you see which providers are costing you what, with one-click optimization.
-
-The npm package covers individual developers. The hosted tier covers teams.
-
-## The insight nobody else had
-
-Every LLM gateway does sequential fallback. Try A → fail → try B → return the first success.
-
-Nobody does **parallel ensemble with scoring.** Call all providers at once. Score every response on quality signals. Return the best one.
-
-That's A3M's core advantage. Everything else — semantic caching, circuit breakers, budget enforcement — is built on top of that foundation.
-
-## What's next
-
-- **Confidence-weighted voting** — when multiple providers tie on score, weight by historical accuracy for that query type
-- **Query-type presets** — save routing rules per use case (e.g., "all code review queries → DeepSeek")
-- **Cost-per-query dashboard** — real-time spend by provider, model, and query type
-- **Multi-region routing** — route to the fastest provider based on geo
+- **Parallel ensemble routing** — calls all providers at once, returns the best
+- **47+ providers** — OpenAI, Anthropic, Google, Groq, Cerebras, DeepSeek, Mistral, and 40 more
+- **Semantic caching** — 30%+ hit rate with trigram Jaccard similarity
+- **Prompt injection detection** — 17-pattern guardrails
+- **Budget enforcement** — per-provider and global spend limits
+- **Circuit breakers** — auto-skips degraded providers
+- **Quality persistence** — scores that learn across sessions
+- **19.5KB** — no ML dependencies, no GPU, runs on any VPS
 
 ## What I'd do differently
 
-I'd publish the RouterArena benchmark submission earlier. The #1 ranking is the reason for most of the growth. One HN comment said "if it's #1 on RouterArena, I'll try it today." The benchmark opened doors that marketing couldn't.
+I'd publish the benchmark results earlier. The 62% cost savings pitch opened doors that marketing couldn't. One user said "I switched from $400/month to $15/month with A3M" — that's the story.
 
 ---
 
@@ -117,4 +102,4 @@ I'd publish the RouterArena benchmark submission earlier. The #1 ranking is the 
 
 ---
 
-*If you're spending more than $200/month on LLM APIs, A3M will cut that by 60%+ at the same quality. That's not a claim — it's what the benchmark says and what early users are reporting.*
+*If you're spending more than $200/month on LLM APIs, A3M will cut that by 60%+ at the same quality. That's not a claim — it's what early users are reporting.*

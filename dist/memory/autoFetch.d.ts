@@ -37,4 +37,3 @@ export declare class AutoFetch {
     private syncCalendar;
 }
 export default AutoFetch;
-//# sourceMappingURL=autoFetch.d.ts.map

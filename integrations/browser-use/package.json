@@ -1,0 +1,34 @@
+{
+  "name": "a3m-browser-use",
+  "version": "1.0.0",
+  "description": "A3M Router integration for browser-use - cost-optimized browser automation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "adaptive-memory-multi-model-router": "^2.14.0",
+    "browser-use": "^0.12.0"
+  },
+  "peerDependencies": {
+    "browser-use": "^0.12.0"
+  },
+  "keywords": [
+    "browser-use",
+    "a3m",
+    "llm",
+    "router",
+    "browser-automation",
+    "cost-optimization",
+    "stealth",
+    "anti-detection"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Das-rebel/a3m-router"
+  },
+  "author": "Subhojit Das",
+  "license": "MIT"
+}

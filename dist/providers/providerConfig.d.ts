@@ -6,7 +6,11 @@
  * 2. Config file at ~/.config/a3m-router/providers.json
  * 3. Runtime registration via registerProvider()
  *
- * 40+ providers across free, cheap, mid-tier, premium, and enterprise tiers.
+ * 70+ providers across free, cheap, mid-tier, premium, and enterprise tiers.
+ * Coverage: Cloudflare Workers AI, HuggingFace Inference, Modal, Lepton, NVIDIA NIM,
+ * Baseten, RunPod, Predibase, Featherless, Abacus, Hyperbolic, Stability AI,
+ * SiliconFlow, Yandex, Tencent, VolcEngine, Baidu, Kuaishou, 360 AI, Naver, Kakao,
+ * AWS Bedrock/SageMaker, Azure, and more.
  */
 export type ProviderTier = 'free' | 'cheap' | 'mid' | 'premium' | 'enterprise';
 export type ProviderFormat = 'openai' | 'anthropic' | 'google' | 'cohere' | 'aws-bedrock' | 'google-vertex';
@@ -50,4 +54,3 @@ export declare function checkAllProviders(): Promise<Record<string, any>>;
 export declare function findCheapestAvailableProvider(model?: string): ProviderDefinition | null;
 export declare function findFastestAvailableProvider(): ProviderDefinition | null;
 export declare function saveConfig(configPath?: string): string;
-//# sourceMappingURL=providerConfig.d.ts.map

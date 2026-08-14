@@ -25,7 +25,8 @@
  *   const chain = healthManager.getFallbackChain(['openai/gpt-4o', 'anthropic/claude-3-5-sonnet']);
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProviderHealthManager = exports.HealthEvent = void 0;
+exports.globalHealthManager = exports.ProviderHealthManager = exports.HealthEvent = void 0;
+exports.mvtShouldRotate = mvtShouldRotate;
 const events_1 = require("events");
 // ============================================================
 // Events
@@ -69,8 +70,11 @@ class ProviderHealthManager extends events_1.EventEmitter {
     }
     /**
      * Record a successful request
+     * @param provider - provider name
+     * @param latencyMs - response latency in ms
+     * @param tokensUsed - tokens consumed this request (for MVT rate-limit tracking)
      */
-    recordSuccess(provider, latencyMs) {
+    recordSuccess(provider, latencyMs, tokensUsed = 0) {
         this.ensureProviderExists(provider);
         const now = Date.now();
         const window = this.getMetricsWindow(provider);
@@ -81,13 +85,31 @@ class ProviderHealthManager extends events_1.EventEmitter {
             failedRequests: 0,
             totalLatency: latencyMs,
             lastLatency: latencyMs,
+            tokensUsed,
         });
         // Trim to window size
         while (window.length > this.config.windowSize) {
             window.shift();
         }
-        // Update health state
+        // === MVT RATE-LIMIT WINDOW MANAGEMENT ===
         const health = this.health.get(provider);
+        const windowElapsed = now - health.rateLimitWindowStart;
+        // If window has elapsed (rolled over), reset the token counter
+        if (windowElapsed >= health.rateLimitWindowMs) {
+            health.tokensUsedThisWindow = 0;
+            health.rateLimitWindowStart = now;
+        }
+        // Accumulate tokens used
+        if (tokensUsed > 0) {
+            health.tokensUsedThisWindow += tokensUsed;
+        }
+        // Update rolling average tokens per request
+        const successfulReqs = window.filter(m => m.successfulRequests > 0);
+        if (successfulReqs.length > 0) {
+            const totalTokens = successfulReqs.reduce((s, m) => s + (m.tokensUsed || 0), 0);
+            health.avgTokensPerRequest = totalTokens / successfulReqs.length;
+        }
+        // Update health state
         health.lastSuccess = now;
         health.consecutiveErrors = 0;
         health.cooldownUntil = 0;
@@ -110,6 +132,7 @@ class ProviderHealthManager extends events_1.EventEmitter {
             failedRequests: 1,
             totalLatency: 0,
             lastLatency: 0,
+            tokensUsed: 0,
         });
         // Trim to window size
         while (window.length > this.config.windowSize) {
@@ -228,6 +251,115 @@ class ProviderHealthManager extends events_1.EventEmitter {
         });
         return scored.map(s => s.provider);
     }
+    // ================================================================
+    // MVT RATE-LIMIT ROTATION (Charnov 1976 Optimal Foraging)
+    // ================================================================
+    /**
+     * Configure rate-limit parameters for a provider.
+     * Call this once during provider registration with the provider's actual limits.
+     *
+     * @param provider - provider name
+     * @param rateLimitTokens - max tokens per window (e.g., 1000000 for 1M)
+     * @param rateLimitWindowMs - window duration in ms (e.g., 60000 for 1 min)
+     */
+    setRateLimitConfig(provider, rateLimitTokens, rateLimitWindowMs) {
+        this.ensureProviderExists(provider);
+        const health = this.health.get(provider);
+        health.rateLimitTokens = rateLimitTokens;
+        health.rateLimitWindowMs = rateLimitWindowMs;
+        // Reset window on config change
+        health.tokensUsedThisWindow = 0;
+        health.rateLimitWindowStart = Date.now();
+    }
+    /**
+     * Estimate cold-start latency for switching to a fallback provider.
+     * Based on the provider's average latency as a proxy.
+     * In production, this would include TLS handshake, DNS, and model warmup costs.
+     */
+    estimateColdStartLatency(fallbackProvider) {
+        const fallbackHealth = this.health.get(fallbackProvider);
+        if (!fallbackHealth)
+            return 1000; // conservative default
+        const baseLatency = fallbackHealth.latency || 500;
+        // Cold start typically 1.5-3x warm latency depending on provider
+        // Add TLS + DNS overhead (typically 50-200ms)
+        const coldStartMultiplier = 2.0;
+        const tlsOverhead = 100;
+        return baseLatency * coldStartMultiplier + tlsOverhead;
+    }
+    /**
+     * Should we rotate away from this provider due to rate-limit depletion?
+     *
+     * Implements Charnov's Marginal Value Theorem (1976):
+     *   g'(t*) = g(t*) / (t* + τ)
+     *
+     * where:
+     *   g(t*) = cumulative successful tokens used so far in this window
+     *   g'(t*) = marginal rate = remaining tokens / time remaining in window
+     *   τ = cold-start latency for the fallback provider
+     *
+     * LEAVE when marginal rate ≤ average rate (including switch cost).
+     * STAY when marginal rate > average rate (still worth staying).
+     *
+     * @param provider - current provider to evaluate
+     * @param fallbackProvider - candidate fallback provider
+     * @returns true if rotation is recommended (marginal rate ≤ break-even rate)
+     */
+    shouldRotateForRateLimit(provider, fallbackProvider) {
+        const health = this.health.get(provider);
+        if (!health)
+            return false;
+        const now = Date.now();
+        const windowElapsed = now - health.rateLimitWindowStart;
+        // If window hasn't started or is fresh, don't rotate
+        if (health.rateLimitWindowStart === 0 || windowElapsed < 100)
+            return false;
+        // If already depleted (tokens used ≥ limit), recommend rotation
+        if (health.tokensUsedThisWindow >= health.rateLimitTokens)
+            return true;
+        // Remaining token budget in current window
+        const remainingBudget = Math.max(0, health.rateLimitTokens - health.tokensUsedThisWindow);
+        const remainingTimeMs = Math.max(1, health.rateLimitWindowMs - windowElapsed);
+        // Marginal rate: tokens per ms we can still consume this window
+        // High marginal rate = plenty of budget left = stay
+        // Low marginal rate = running out = consider leaving
+        const marginalRate = remainingBudget / remainingTimeMs;
+        // Cumulative successful tokens so far
+        const g_t = health.tokensUsedThisWindow;
+        // Cold-start cost for switching to fallback
+        const tau = this.estimateColdStartLatency(fallbackProvider);
+        // Break-even rate: the rate at which staying = switching
+        // From MVT: g'(t*) = g(t*) / (t* + τ)
+        // In our terms: marginal_rate = cumulative_rate * (t* / (t* + τ))
+        // But here we use: avg_rate_including_switch = g_t / (windowElapsed + τ)
+        // This is the rate INCLUDING the cost of switching (we lose τ ms of this window)
+        const avgRateIncludingSwitch = g_t / (windowElapsed + tau);
+        // MVT says: LEAVE when marginal_rate ≤ avg_rate_including_switch
+        // (the marginal gain from staying ≤ the average gain achievable including switch cost)
+        // STAY when marginal_rate > avg_rate_including_switch
+        // (we can still get more from this window than the switch costs us)
+        const ROTATION_THRESHOLD_FACTOR = 1.0; // 1.0 = exact MVT; >1 = leave earlier, <1 = stay longer
+        if (marginalRate <= avgRateIncludingSwitch * ROTATION_THRESHOLD_FACTOR) {
+            return true; // MVT says: leave this patch
+        }
+        return false; // MVT says: stay in this patch
+    }
+    /**
+     * Get the marginal rate for a provider (tokens/ms remaining in window).
+     * Useful for monitoring and debugging MVT decisions.
+     */
+    getMarginalRate(provider) {
+        const health = this.health.get(provider);
+        if (!health || health.rateLimitWindowStart === 0)
+            return null;
+        const now = Date.now();
+        const windowElapsed = now - health.rateLimitWindowStart;
+        const remainingBudget = Math.max(0, health.rateLimitTokens - health.tokensUsedThisWindow);
+        const remainingTimeMs = Math.max(1, health.rateLimitWindowMs - windowElapsed);
+        const marginalRate = remainingBudget / remainingTimeMs;
+        const utilizationPct = (health.tokensUsedThisWindow / health.rateLimitTokens) * 100;
+        return { marginalRate, remainingBudget, remainingTimeMs, utilizationPct };
+    }
     /**
      * Mark provider as disabled (manual circuit breaker)
      */
@@ -310,6 +442,13 @@ class ProviderHealthManager extends events_1.EventEmitter {
                 isHealthy: true,
                 cooldownUntil: 0,
                 healthScore: 1.0,
+                // === MVT RATE-LIMIT DEFAULTS ===
+                // Conservative defaults: 1M tokens/min (most free tier providers)
+                tokensUsedThisWindow: 0,
+                rateLimitWindowStart: now,
+                rateLimitTokens: 1_000_000,
+                rateLimitWindowMs: 60_000,
+                avgTokensPerRequest: 500, // conservative default estimate
             });
             this.metrics.set(provider, []);
         }
@@ -368,7 +507,54 @@ class ProviderHealthManager extends events_1.EventEmitter {
 }
 exports.ProviderHealthManager = ProviderHealthManager;
 // ============================================================
-// Exports
+// ============================================================
+// EXPORTS
 // ============================================================
 exports.default = ProviderHealthManager;
+/** Singleton instance for use across the app without DI */
+exports.globalHealthManager = new ProviderHealthManager();
+/**
+ * Stateless MVT rate-limit rotation helper.
+ * Call this after routeQuery returns to check if the selected provider
+ * should be rotated away from due to rate-limit depletion.
+ *
+ * Uses Charnov (1976): g'(t*) = g(t*) / (t* + τ)
+ * Leave when marginal rate ≤ avg rate including switch cost.
+ *
+ * @param providerHealth - current provider health state (from healthManager.getHealth())
+ * @param fallbackProviderLatencyMs - estimated cold-start latency for fallback
+ * @param estimatedTokensThisCall - estimated tokens for this request
+ * @returns true if MVT recommends rotation
+ */
+function mvtShouldRotate(providerHealth, fallbackProviderLatencyMs, estimatedTokensThisCall = 500) {
+    const now = Date.now();
+    // No window started yet — stay
+    if (providerHealth.rateLimitWindowStart === 0)
+        return false;
+    const windowElapsed = now - providerHealth.rateLimitWindowStart;
+    // Window is fresh — stay
+    if (windowElapsed < 100)
+        return false;
+    // Already depleted — rotate immediately
+    if (providerHealth.tokensUsedThisWindow >= providerHealth.rateLimitTokens)
+        return true;
+    // Remaining budget after this call
+    const budgetAfter = providerHealth.rateLimitTokens - providerHealth.tokensUsedThisWindow - estimatedTokensThisCall;
+    // If this call would exceed the limit, recommend rotation
+    if (budgetAfter < 0)
+        return true;
+    const remainingTimeMs = Math.max(1, providerHealth.rateLimitWindowMs - windowElapsed);
+    // Marginal rate: tokens/ms we can still consume this window after this call
+    const marginalRate = budgetAfter / remainingTimeMs;
+    // Cumulative tokens used so far (proxy for g(t*))
+    const g_t = providerHealth.tokensUsedThisWindow;
+    // τ = cold-start latency for fallback
+    const tau = fallbackProviderLatencyMs;
+    // Break-even rate: avg rate including switch cost
+    // From MVT: g'(t*) = g(t*) / (t* + τ)
+    // Our marginal rate should exceed this to justify staying
+    const avgRateIncludingSwitch = g_t / (windowElapsed + tau);
+    // Leave when marginal ≤ break-even (MVT optimality condition)
+    return marginalRate <= avgRateIncludingSwitch;
+}
 //# sourceMappingURL=providerHealth.js.map

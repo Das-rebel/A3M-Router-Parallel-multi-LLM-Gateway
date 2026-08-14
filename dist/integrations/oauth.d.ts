@@ -67,4 +67,3 @@ export declare class OAuthManager {
     private generateState;
 }
 export default OAuthManager;
-//# sourceMappingURL=oauth.d.ts.map

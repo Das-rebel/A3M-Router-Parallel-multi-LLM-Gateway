@@ -43,6 +43,17 @@ export interface ProviderHealth {
     cooldownUntil: number;
     /** Health score 0-1 (higher is better) */
     healthScore: number;
+    /** === MVT RATE-LIMIT TRACKING (Charnov 1976 optimal foraging) === */
+    /** Tokens used in current rate-limit window */
+    tokensUsedThisWindow: number;
+    /** Timestamp when current rate-limit window started */
+    rateLimitWindowStart: number;
+    /** Maximum tokens per rate-limit window */
+    rateLimitTokens: number;
+    /** Rate-limit window duration in ms (default: 60000 = 1 min) */
+    rateLimitWindowMs: number;
+    /** Rolling average tokens per successful request */
+    avgTokensPerRequest: number;
 }
 export interface ProviderMetrics {
     /** Provider name */
@@ -57,6 +68,8 @@ export interface ProviderMetrics {
     totalLatency: number;
     /** Last measured latency */
     lastLatency: number;
+    /** Tokens consumed this request (for rate-limit tracking) */
+    tokensUsed: number;
 }
 export interface HealthManagerConfig {
     /** Window size for rolling metrics (default: 100 requests) */
@@ -92,8 +105,11 @@ export declare class ProviderHealthManager extends EventEmitter {
     constructor(config?: HealthManagerConfig);
     /**
      * Record a successful request
+     * @param provider - provider name
+     * @param latencyMs - response latency in ms
+     * @param tokensUsed - tokens consumed this request (for MVT rate-limit tracking)
      */
-    recordSuccess(provider: string, latencyMs: number): void;
+    recordSuccess(provider: string, latencyMs: number, tokensUsed?: number): void;
     /**
      * Record a failed request
      */
@@ -124,6 +140,50 @@ export declare class ProviderHealthManager extends EventEmitter {
      */
     getFallbackChain(providers: string[]): string[];
     /**
+     * Configure rate-limit parameters for a provider.
+     * Call this once during provider registration with the provider's actual limits.
+     *
+     * @param provider - provider name
+     * @param rateLimitTokens - max tokens per window (e.g., 1000000 for 1M)
+     * @param rateLimitWindowMs - window duration in ms (e.g., 60000 for 1 min)
+     */
+    setRateLimitConfig(provider: string, rateLimitTokens: number, rateLimitWindowMs: number): void;
+    /**
+     * Estimate cold-start latency for switching to a fallback provider.
+     * Based on the provider's average latency as a proxy.
+     * In production, this would include TLS handshake, DNS, and model warmup costs.
+     */
+    private estimateColdStartLatency;
+    /**
+     * Should we rotate away from this provider due to rate-limit depletion?
+     *
+     * Implements Charnov's Marginal Value Theorem (1976):
+     *   g'(t*) = g(t*) / (t* + τ)
+     *
+     * where:
+     *   g(t*) = cumulative successful tokens used so far in this window
+     *   g'(t*) = marginal rate = remaining tokens / time remaining in window
+     *   τ = cold-start latency for the fallback provider
+     *
+     * LEAVE when marginal rate ≤ average rate (including switch cost).
+     * STAY when marginal rate > average rate (still worth staying).
+     *
+     * @param provider - current provider to evaluate
+     * @param fallbackProvider - candidate fallback provider
+     * @returns true if rotation is recommended (marginal rate ≤ break-even rate)
+     */
+    shouldRotateForRateLimit(provider: string, fallbackProvider: string): boolean;
+    /**
+     * Get the marginal rate for a provider (tokens/ms remaining in window).
+     * Useful for monitoring and debugging MVT decisions.
+     */
+    getMarginalRate(provider: string): {
+        marginalRate: number;
+        remainingBudget: number;
+        remainingTimeMs: number;
+        utilizationPct: number;
+    } | null;
+    /**
      * Mark provider as disabled (manual circuit breaker)
      */
     disableProvider(provider: string, reason: string): void;
@@ -151,4 +211,19 @@ export declare class ProviderHealthManager extends EventEmitter {
     private calculateLatencyScore;
 }
 export default ProviderHealthManager;
-//# sourceMappingURL=providerHealth.d.ts.map
+/** Singleton instance for use across the app without DI */
+export declare const globalHealthManager: ProviderHealthManager;
+/**
+ * Stateless MVT rate-limit rotation helper.
+ * Call this after routeQuery returns to check if the selected provider
+ * should be rotated away from due to rate-limit depletion.
+ *
+ * Uses Charnov (1976): g'(t*) = g(t*) / (t* + τ)
+ * Leave when marginal rate ≤ avg rate including switch cost.
+ *
+ * @param providerHealth - current provider health state (from healthManager.getHealth())
+ * @param fallbackProviderLatencyMs - estimated cold-start latency for fallback
+ * @param estimatedTokensThisCall - estimated tokens for this request
+ * @returns true if MVT recommends rotation
+ */
+export declare function mvtShouldRotate(providerHealth: ProviderHealth, fallbackProviderLatencyMs: number, estimatedTokensThisCall?: number): boolean;

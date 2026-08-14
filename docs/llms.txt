@@ -1,7 +1,7 @@
 # A3M Router
 
 ## Description
-A3M Router is an OpenAI-compatible LLM routing gateway that selects the cheapest capable provider per query using multi-signal heuristic scoring. Routes queries across 47+ providers in parallel, scores responses by confidence, and returns the best result. No GPU required; pure heuristic routing.
+A3M Router is an OpenAI-compatible LLM routing gateway that selects the cheapest capable provider per query using multi-signal heuristic scoring. Routes queries across 80+ providers in parallel, scores responses by confidence, and returns the best result. No GPU required; pure heuristic routing.
 
 ## Architecture
 - Stateless proxy between client applications and LLM providers
@@ -26,7 +26,7 @@ Complexity score (0.0–1.0) maps to provider tiers: free (taste-1), cheap (llam
 | EXP3-Inspired Diversity | Adversarial bandit techniques for exploration vs exploitation balance |
 | Semantic Caching | Embedding-based lookup, configurable similarity threshold, per-route TTL |
 | Adaptive Memory | EMA-based model quality scoring, no retraining needed |
-| 47+ Providers | OpenAI, Anthropic, Groq, Gemini, DeepSeek, Mistral, OpenRouter, Ollama, vLLM, and 40+ more |
+| 80+ Providers | OpenAI, Anthropic, Groq, Gemini, DeepSeek, Mistral, OpenRouter, Ollama, vLLM, and 40+ more |
 | Circuit Breaker | 3-failure trigger, 60s cooldown per provider |
 | Per-Provider Retry | Exponential backoff with 429 detection and automatic failover |
 | Budget Enforcement | Per-user/team caps, real-time alerts at 50%/80%/100% |
@@ -41,7 +41,7 @@ Complexity score (0.0–1.0) maps to provider tiers: free (taste-1), cheap (llam
 | Cost savings vs all-premium | 62.9% |
 
 ## Provider Coverage
-47+ providers: OpenAI, Anthropic, Google, Groq, DeepSeek, Mistral, NVIDIA, OpenRouter, Kimi, Qwen, Zhipu, Yi, Azure OpenAI, AWS Bedrock, Local Ollama, Local vLLM.
+80+ providers: OpenAI, Anthropic, Google, Groq, DeepSeek, Mistral, NVIDIA, OpenRouter, Kimi, Qwen, Zhipu, Yi, Azure OpenAI, AWS Bedrock, Local Ollama, Local vLLM.
 
 ## Features
 - Parallel ensemble execution (multiple providers simultaneously, confidence-weighted scoring)

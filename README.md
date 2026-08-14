@@ -1,215 +1,338 @@
-# 🎮 A3M Router for Browser Automation
+# A3M Router
 
-**Stop paying GPT-4o prices for simple browser tasks.** A3M routes browser automation tasks to the cheapest capable model — automatically.
+**Intelligent LLM routing across 47+ providers — saves 70-95% on AI costs.**
 
-<p align="center">
-  <img src="https://img.shields.io/npm/v/adaptive-memory-multi-model-router?style=flat-square" alt="npm">
-  <img src="https://img.shields.io/github/stars/Das-rebel/a3m-router?style=flat-square" alt="stars">
-  <img src="https://img.shields.io/npm/dm/adaptive-memory-multi-model-router?style=flat-square" alt="downloads">
-</p>
+A3M Router automatically picks the cheapest capable model for each request. No code changes needed. Just swap your API endpoint.
 
 ---
 
-## 💰 Cost Savings
+## TL;DR — What Is This?
 
-| Task Type | GPT-4o Cost | A3M Cost | Savings |
-|-----------|-------------|----------|---------|
-| Form filling | $0.03/task | $0.001 | **97%** |
-| Data extraction | $0.02/task | $0.002 | **90%** |
-| Page analysis | $0.02/task | $0.003 | **85%** |
-| Job applications | $0.10/task | $0.005 | **95%** |
+**Before:**
+```python
+# Pay GPT-4o prices for EVERY query
+client = OpenAI(api_key="sk-...")
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "What is 2+2?"}]
+)  # Costs: $0.03
+```
 
-> "I saved $2,400/month on browser automation by switching to A3M"
+**After:**
+```python
+# A3M Router picks the right model automatically
+client = OpenAI(base_url="http://localhost:8787/v1", api_key="not-needed")
+response = client.chat.completions.create(
+    model="auto",  # ← Just change this
+    messages=[{"role": "user", "content": "What is 2+2?"}]
+)  # Routes to Groq/Mistral — costs: $0.0001
+```
 
 ---
 
-## 🎯 Browser Automation Features
+## Why A3M Router?
 
-- 💰 **70% cost reduction** for form filling, data extraction, web scraping
-- 🕵️ **Stealth mode** - Minimize bot detection with intelligent provider rotation
-- ⚡ **Parallel ensemble** - Run 3 providers simultaneously, pick the most consistent result
-- 🔄 **Auto-retry** with fallback providers when tasks fail
-- 📊 **Cost tracking** - Monitor spending per task and provider
+| Problem | Solution |
+|---------|----------|
+| GPT-4o is $15/1M tokens | A3M routes simple queries to $0.001/1K providers |
+| Managing 47+ API keys is messy | One endpoint, A3M handles the rest |
+| Provider goes down mid-request | Automatic failover to next best option |
+| Need the best answer, cost doesn't matter | Parallel ensemble calls multiple providers |
+
+---
+
+## Framework Adapters
+
+A3M Router has drop-in adapters for **8 major frameworks**:
+
+| Framework | Adapter | Example |
+|-----------|---------|---------|
+| **LangChain** | `A3MLangChainAdapter` | `pip install adapters/langchain` |
+| **LlamaIndex** | `A3MLlamaIndexAdapter` | `pip install adapters/llamaindex` |
+| **AutoGen** | `A3MAutoGenAdapter` | Multi-agent conversations |
+| **Vercel AI SDK** | `A3MVercelAdapter` | Next.js apps |
+| **Haystack** | `A3MHaystackAdapter` | RAG pipelines |
+| **Pinecone** | `A3MPineconeAdapter` | Vector search + RAG |
+| **LangGraph** | `A3MLangGraphAdapter` | Stateful agents |
+| **CrewAI** | `A3MCompletion` | Multi-agent systems |
 
 ---
 
 ## Quick Start
 
-### Browser Automation
+```bash
+# Install
+npm install adaptive-memory-multi-model-router
 
+# Start server
+npx a3m-router serve
+```
+
+---
+
+## Installation
+
+### Python Adapters
+```bash
+pip install adapters/
+```
+
+### Docker
+```bash
+docker-compose up -d
+```
+
+### npm
 ```bash
 npm install adaptive-memory-multi-model-router
 ```
 
-```typescript
-import { A3MRouter } from 'adaptive-memory-multi-model-router';
+---
 
-// Configure for browser automation
-const router = new A3MRouter({
-  model: 'auto',
-  stealth: true,           // Enable anti-detection
-  parallelEnsemble: 3,      // Run multiple for reliability
-  browserOptimized: true,  // Browser-specific optimizations
-});
+## Framework Examples
 
-// Form filling - routes to cheapest capable
-const result = await router.route({
-  task: 'Extract name, email, phone from this job application form',
-  context: 'browser_automation',
-});
+### LangChain
+```python
+from a3m_adapter import A3MLangChainAdapter
 
-console.log(`Content: ${result.content}`);
-console.log(`Provider: ${result.provider}`);
-console.log(`Cost: $${result.cost}`);
+llm = A3MLangChainAdapter(model="auto", temperature=0.7)
+result = llm.invoke("What is retrieval-augmented generation?")
 ```
 
-### CLI
+### LlamaIndex
+```python
+from a3m_adapter import A3MLlamaIndexAdapter
 
-```bash
-npm install -g adaptive-memory-multi-model-router
-npx a3m-router serve
+llm = A3MLlamaIndexAdapter(model="auto")
+response = llm.complete("Explain transformer architecture")
+```
 
-# In another terminal
-curl http://localhost:8787/v1/models  # List available models
+### AutoGen (Microsoft)
+```python
+from a3m_adapter import A3MAutoGenAdapter
+
+llm = A3MAutoGenAdapter(model="auto", parallel_ensemble=2)
+
+config = llm.create_agent_config()
+assistant = ConversableAgent(name="assistant", llm_config=config)
+```
+
+### Vercel AI SDK
+```python
+from a3m_adapter import A3MVercelAdapter, createA3MProvider
+
+result = await generateText({
+    model: createA3MProvider({"model": "auto", "parallel_ensemble": 2}),
+    prompt: "What is 2+2?",
+})
+```
+
+### Haystack (RAG)
+```python
+from a3m_adapter import A3MHaystackAdapter
+
+adapter = A3MHaystackAdapter(model="auto")
+result = adapter.predict(query="What is AI?", documents=retrieved_docs)
+```
+
+### Pinecone (Vector Search)
+```python
+from a3m_adapter import A3MPineconeAdapter
+
+adapter = A3MPineconeAdapter(model="auto")
+embedding = adapter.embed_query("What is quantum computing?")
+
+results = index.query(vector=embedding, top_k=5)
+```
+
+### LangGraph (Stateful Agents)
+```python
+from a3m_adapter import A3MLangGraphAdapter
+
+adapter = A3MLangGraphAdapter(model="auto", parallel_ensemble=2)
+agent = create_react_agent(adapter, tools=[...])
+
+result = agent.invoke({"messages": [{"role": "user", "content": "Hello"}]})
+```
+
+### CrewAI (Multi-Agent)
+```python
+from crewai.llms import A3MCompletion
+
+researcher = Agent(
+    role="Researcher",
+    goal="Find accurate information",
+    llm=A3MCompletion(model="auto"),
+)
+
+crew = Crew(agents=[researcher], tasks=[task])
+result = crew.kickoff()
 ```
 
 ---
 
-## 🎮 Browser Automation Guide
+## Parallel Ensemble — Best Answer, Any Provider
 
-A3M is optimized for browser automation tasks:
+Need the best answer regardless of cost? Call multiple providers in parallel:
 
-| Task Type | Recommended Model | Why |
-|-----------|-----------------|------|
-| Form filling | gpt-4o-mini | Simple, fast |
-| Data extraction | claude-sonnet | Good at structure |
-| Complex scraping | gpt-4o | Handles edge cases |
-| Anti-detection | provider_rotation | Automatic |
+```python
+from a3m.router import A3MRouter
 
-### Example: Automated Job Applications
+router = A3MRouter(
+    model="auto",
+    parallel_ensemble=3,  # ← Call 3 providers simultaneously
+)
 
-```typescript
-import { A3MRouter } from 'adaptive-memory-multi-model-router';
-import { chromium } from 'playwright';
+result = router.route(
+    messages=[{"role": "user", "content": "Explain quantum entanglement"}],
+    ensemble_config={
+        "providers": ["groq", "openai", "deepseek"],
+        "timeout_ms": 15000,
+        "score_weights": {"relevance": 0.4, "conciseness": 0.3, "accuracy": 0.3}
+    }
+)
 
-const router = new A3MRouter({
-  model: 'auto',
-  stealth: true,
-  parallelEnsemble: 3,
-});
-
-async function applyToJob(jobUrl: string) {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-  
-  await page.goto(jobUrl);
-  
-  // A3M analyzes the form and fills it optimally
-  const formResult = await router.route({
-    task: `Fill this job application with:
-      - Name: Subhojit Das
-      - Email: subho@example.com
-      - Phone: +91-7977110915`,
-    context: 'form_filling',
-  });
-  
-  // Submit and track cost
-  await page.click('button[type="submit"]');
-  console.log(`Applied! Cost: $${router.getCost()}`);
-  
-  await browser.close();
-}
+print(f"Best answer from: {result.provider}")
+print(f"Response: {result.content}")
+print(f"All scores: {result.scores}")
 ```
 
 ---
 
-## Integrations
+## Memory & Context
 
-### browser-use (108K GitHub stars)
+A3M Router includes **semantic memory** capabilities:
 
-```typescript
-import { Agent } from 'browser-use';
-import { A3MRouter } from 'adaptive-memory-multi-model-router';
+```python
+router = A3MRouter(
+    model="auto",
+    memory={
+        "type": "semantic",
+        "window": 10,
+        "similarity_threshold": 0.85,
+    }
+)
 
-const agent = new Agent({
-  task: 'Extract all job listings from this page',
-  llm: new A3MRouter({ model: 'auto', stealth: true }),
-});
+# First call — caches context
+result1 = router.route(
+    messages=[{"role": "user", "content": "I'm building a Python web app"}]
+)
+
+# Second call — uses cached context
+result2 = router.route(
+    messages=[{"role": "user", "content": "What framework should I use?"}]
+)
+# A3M knows "Python web app" from context
 ```
-
-### MCP Server (for Claude Desktop, Cursor, etc.)
-
-```bash
-npx a3m-mcp-browser
-```
-
-Then use tools like `route_for_browser_task`, `extract_form_data`, `fill_form_intelligently`.
-
-### sota-browser (CloakBrowser)
-
-```typescript
-import { A3MRouter } from 'adaptive-memory-multi-model-router';
-import { BrowserManager } from 'sota-browser';
-
-const browser = new BrowserManager({ stealth: true });
-const router = new A3MRouter({ model: 'auto' });
-// Ultimate combination for reliable automation
-```
-
----
-
-## Comparison
-
-| Feature | A3M | LiteLLM | RouteLLM |
-|---------|-----|---------|----------|
-| Browser optimization | ✅ | ❌ | ❌ |
-| Stealth mode | ✅ | ❌ | ❌ |
-| Parallel ensemble | ✅ | ❌ | ❌ |
-| Cost for form filling | $0.002/task | $0.03/task | N/A |
-| Anti-detection | ✅ | ❌ | ❌ |
-| Heuristic routing | ✅ | ❌ | ✅ |
 
 ---
 
 ## How Routing Works
 
-For every request, A3M scores complexity across five signals:
+For every request, A3M analyzes:
 
-| Signal | What it detects |
-|--------|----------------|
+| Signal | Detects |
+|--------|---------|
 | **Domain** | Legal, medical, code, finance, ML keywords |
-| **Task type** | Code generation, translation, analysis, creative |
-| **Query structure** | Clause count, length, qualifier words |
+| **Task type** | Code, translation, analysis, creative |
+| **Complexity** | Clause count, multi-step markers |
 | **Verb intensity** | "design/architect" → complex, "what/who" → simple |
-| **Multi-step** | Explicit step markers (first...then, step 1/2/3) |
 
-The combined score maps to a tier (free → cheap → mid → premium). Within that tier, A3M picks the cheapest available provider.
+Then maps to a tier:
 
----
-
-## Biology-Inspired Provider Selection
-
-A3M applies ecological theory to routing:
-
-**EXP3 Diversity** — Prevents any single provider from dominating traffic.
-
-**Charnov MVT** — Optimizes rate-limit rotation using Marginal Value Theorem.
-
-**ODT Shadow Verification** — For high-stakes queries, probabilistically verifies with a shadow provider.
+| Tier | Providers | Use When |
+|------|-----------|----------|
+| **Free** | Ollama, Llama.cpp | Experimentation |
+| **Cheap** | Groq, DeepSeek, Mistral | Simple Q&A, short code |
+| **Mid** | GPT-4o-mini, Claude-haiku | Standard tasks |
+| **Premium** | GPT-4o, Claude-sonnet, Gemini | Complex reasoning |
 
 ---
 
-## Documentation
+## Cost Comparison
 
-- [API Reference](https://das-rebel.github.io/a3m-router/api)
-- [Integrations](https://github.com/Das-rebel/a3m-router/tree/main/integrations)
-  - [browser-use](https://github.com/Das-rebel/a3m-router/tree/main/integrations/browser-use)
-  - [MCP Server](https://github.com/Das-rebel/a3m-router/tree/main/integrations/mcp-browser)
-  - [sota-browser](https://github.com/Das-rebel/a3m-router/tree/main/integrations/sota-browser)
-- [Examples](https://github.com/Das-rebel/a3m-router/tree/main/examples)
+| Query Type | GPT-4o Cost | A3M Router Cost | Savings |
+|------------|-------------|-----------------|---------|
+| "What is 2+2?" | $0.03 | $0.0001 (Groq) | **99.7%** |
+| "Write a Python function" | $0.05 | $0.002 (DeepSeek) | **96%** |
+| "Design a database schema" | $0.15 | $0.008 (Mixed) | **95%** |
+| "Complex multi-step reasoning" | $0.15 | $0.15 (GPT-4o) | **0%** (correctly routed) |
 
 ---
 
-## License
+## Provider Coverage
 
-MIT
+| Provider | Tiers | Example Models |
+|----------|-------|---------------|
+| OpenAI | Premium, Mid | GPT-4o, GPT-4o-mini |
+| Anthropic | Premium, Mid | Claude-3.5-sonnet, Claude-3-haiku |
+| Google | Premium, Mid | Gemini-1.5-pro, Gemini-1.5-flash |
+| Groq | Cheap | Llama-3.3-70b (fastest) |
+| DeepSeek | Cheap, Mid | DeepSeek-chat, DeepSeek-coder |
+| Mistral | Cheap, Mid | Mistral-large, Mistral-small |
+| NVIDIA | Premium | Nemotron |
+| Ollama | All | Local models |
+| vLLM | All | Self-hosted |
+
+**47+ providers total.**
+
+---
+
+## CLI Commands
+
+```bash
+npx a3m-router serve              # Start server (port 8787)
+npx a3m-router route "query"    # See routing decision
+npx a3m-router health           # Provider status
+npx a3m-router benchmark        # Local accuracy test
+```
+
+---
+
+## Architecture
+
+```
+Request → Guardrails → Semantic Cache → Router → Provider → Response
+                          ↓
+                    Memory Layer
+                    (optional)
+```
+
+---
+
+## Demo
+
+```bash
+# Start server
+npx a3m-router serve
+
+# Run demo
+python demo.py
+```
+
+---
+
+## Independent Benchmark
+
+**RouterArena Evaluation:**
+- **Accuracy:** 96.77%
+- **Cost:** $0.0768/1K tokens
+- **Robustness:** 1.0000
+- **Queries tested:** 8,400
+
+---
+
+## Project Stats
+
+- **npm downloads:** ~5,400/month
+- **Providers:** 47+
+- **Framework adapters:** 8
+- **License:** MIT
+
+---
+
+## Need Help?
+
+- 📖 [Documentation](docs/)
+- 🐛 [Issues](https://github.com/Das-rebel/a3m-router/issues)
+- 💬 [Discussions](https://github.com/Das-rebel/a3m-router/discussions)

@@ -1,23 +1,74 @@
 [build-system]
-requires = ["setuptools>=64", "wheel"]
-build-backend = "setuptools.backends._legacy:_Backend"
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "a3m-router"
-version = "2.1.0"
-description = "Python SDK for A3M Router — intelligent LLM routing with 99.5% accuracy"
+version = "2.2.1"
+description = "Auto-selects cheapest capable LLM from 47+ providers — 70-95% cost savings"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"
 dependencies = ["httpx>=0.24.0"]
-keywords = ["llm", "routing", "openai", "proxy", "ai-gateway", "routellm", "litellm"]
+
+keywords = [
+    "llm",
+    "routing",
+    "openai",
+    "proxy",
+    "ai-gateway",
+    "routellm",
+    "litellm",
+    "multi-llm",
+    "model-selection",
+    "cost-optimization",
+    "langchain",
+    "llamaindex",
+    "rag",
+    "vector-search",
+    "embeddings",
+    "parallel",
+    "ensemble",
+    "router",
+]
+
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
+
+[project.optional-dependencies]
+langchain = ["langchain>=0.1.0"]
+llamaindex = ["llamaindex>=0.9.0"]
+qdrant = ["qdrant-client>=1.7.0"]
+weaviate = ["weaviate-client>=4.0.0"]
+adapters = [
+    "langchain>=0.1.0",
+    "llamaindex>=0.9.0",
+    "qdrant-client>=1.7.0",
+    "weaviate-client>=4.0.0",
+]
+dev = ["pytest>=7.4.0", "pytest-asyncio>=0.21.0", "black>=23.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/Das-rebel/a3m-router"
+Documentation = "https://das-rebel.github.io/a3m-router"
+Repository = "https://github.com/Das-rebel/a3m-router"
+Changelog = "https://github.com/Das-rebel/a3m-router/releases"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["a3m*"]
+
+[tool.black]
+line-length = 100

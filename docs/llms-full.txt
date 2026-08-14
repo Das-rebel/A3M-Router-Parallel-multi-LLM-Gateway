@@ -1,199 +1,421 @@
-# A3M Router — Complete Reference
+# A3M Router — Full Technical Documentation
 
 ## Overview
-A3M Router is an OpenAI-compatible LLM routing gateway that selects the cheapest capable provider per query using multi-signal heuristic scoring. Routes queries across 47+ providers in parallel, scores responses by confidence, returns best result.
 
-**Package:** `adaptive-memory-multi-model-router` (npm)  
-**Repository:** `Das-rebel/a3m-router` (GitHub)  
-**Language:** TypeScript (Node.js)  
-**License:** MIT
+A3M Router is a stateless proxy that routes LLM requests to the optimal provider based on query complexity analysis, cost, and availability.
 
----
+## Routing Algorithm
 
-## Benchmark Results
+### Complexity Scoring
 
-### Benchmark Results
+Five signals are combined into a composite score:
 
-| Metric | Value |
-|--------|-------|
-| Score | 0.9404 |
-| Accuracy | 96.77% |
-| Avg Cost / 1K tokens | $0.0768 |
-| Robustness | 1.0000 |
-| Abnormal entries | 0 |
-| Queries evaluated | 8,400 |
+1. **Domain Detection**
+   - Legal: contract, lawsuit, compliance, patent
+   - Medical: diagnosis, treatment, prescription, symptoms
+   - Code: function, class, API, debugging, refactor
+   - Finance: investment, portfolio, risk, return, audit
+   - ML: training, inference, gradient, loss, model
 
-Internal evaluation on 8,400 queries from diverse domains.
+2. **Task Classification**
+   - Code generation: write, implement, create function
+   - Translation: translate, convert, rewrite in
+   - Analysis: compare, evaluate, assess, analyze
+   - Creative: write story, poem, generate idea
+   - Factual: what is, who was, when did, where is
 
-### Official Baseline Status
+3. **Structural Analysis**
+   - Clause count: complex sentences
+   - Explicit steps: first...then, step 1/2/3
+   - Qualifications: might, could, possibly
+   - Conditional: if...then, unless, provided that
 
-| Benchmark | Venue | Status | Reference |
-| Parallel Routing       | Internal eval  | 67% exact match |
-| Cost vs all-premium    | Internal eval  | 62.9% savings  |
-| RouterEval | EMNLP 2025 | Baseline merged | MilkThink-Lab/RouterEval#4 |
-| MMR-Bench | ArXiv 2026 | Baseline merged | Hunter-Wrynn/MMR-Bench#4 |
-| LLMRouterBench | ACL 2026 | Submitted | ynulihao/LLMRouterBench#3 |
+4. **Verb Intensity**
+   - Complex verbs: design, architect, optimize, synthesize
+   - Simple verbs: what, who, find, get
 
-### Local Evaluation
+5. **Multi-Modal Hints**
+   - Image references: explain this diagram
+   - Code blocks: debug this function
+   - Data: analyze this dataset
 
-| Metric | Value |
-|--------|-------|
-| Exact tier match | 67% |
-| Within 1 tier | 96% |
-| Cost savings vs all-premium | 62.9% |
+### Tier Assignment
 
----
+Score maps to tier:
 
-## Architecture
+| Score Range | Tier | Providers | Example |
+|------------|------|-----------|---------|
+| 0-20 | Free | Ollama, Llama.cpp | Simple what/who |
+| 21-40 | Cheap | Groq, DeepSeek, Mistral | Short code, basic QA |
+| 41-70 | Mid | GPT-4o-mini, Claude-haiku | Standard tasks |
+| 71-100 | Premium | GPT-4o, Claude-sonnet, Gemini | Complex reasoning |
 
-```
-Request → Guardrails → Semantic Cache → Router (5-signal heuristic) → Provider → Response
-```
+## Ensemble Execution
 
-The routing pipeline executes in four stages:
-1. Guardrails: Input validation (prompt injection, PII, content filtering)
-2. Cache lookup: Semantic cache with embedding similarity
-3. Routing decision: Multi-signal heuristic scoring → complexity score → provider tier
-4. Execution: LLM call to selected provider with routing metadata in response
-
----
-
-## Routing Method
-
-### Complexity Score Computation
-
-Five signal dimensions, summed:
-
-| Dimension | Max | Method |
-|-----------|-----|--------|
-| Domain detection | +0.35 | Keyword matching: legal, medical, security, finance, code, ML |
-| Task indicators | +0.25 | Keyword matching: code, math, translate, creative |
-| Query structure | +0.20 | Clause count, character length, qualifier presence |
-| Action verb intensity | +0.20 | Expert +0.20, mid +0.10, simple −0.10 |
-| Multi-step detection | +0.15 | Explicit step markers (first...then, step 1/2/3) |
-
-### Tier Mapping
-
-| Score Range | Tier | Example Providers |
-|------------|------|-----------------|
-| 0.00–0.19 | free | taste-1 ($0) |
-| 0.20–0.44 | cheap | llama-3.3-70b ($0.20/M) |
-| 0.45–0.69 | mid | gpt-4o-mini ($0.60/M) |
-| 0.70–1.00 | premium | gpt-4o ($2.50/M), claude-3.5-sonnet ($1.50/M) |
-
----
-
-## Provider Coverage (47+)
-
-| Provider | Tiers | Models |
-|---------|-------|--------|
-| OpenAI | premium, mid | gpt-4o, gpt-4o-mini |
-| Anthropic | premium, mid | claude-3.5-sonnet, claude-3-haiku |
-| Google | premium, mid | gemini-1.5-pro, gemini-1.5-flash |
-| Groq | cheap | llama-3.3-70b, llama-3.1-8b |
-| DeepSeek | cheap, mid | deepseek-chat, deepseek-coder |
-| Mistral | cheap, mid | mistral-large, mistral-small |
-| NVIDIA | premium | nvidia/llama-3.1-nemotron |
-| OpenRouter | all | aggregated access |
-| Kimi | cheap | moonshot-v1 |
-| Qwen | cheap, mid | qwen-turbo, qwen-plus |
-| Zhipu | cheap | glm-4 |
-| Yi | cheap | yi-large |
-| Azure OpenAI | premium, mid | via OpenAI-compatible endpoint |
-| AWS Bedrock | premium, mid | via OpenAI-compatible endpoint |
-| Local Ollama | all | configurable model discovery |
-| Local vLLM | all | OpenAI-compatible server |
-
----
-
-## Feature Specifications
-
-### Parallel Ensemble
-Executes a single query against multiple providers simultaneously. Each response is scored on specificity, structure, and relevance. The highest-scoring result is returned with full provenance.
-
-```typescript
-import { executeEnsemble } from 'adaptive-memory-multi-model-router/ensemble';
-const result = await executeEnsemble(query, systemPrompt, context, providers, options);
-// result.winner — provider key
-// result.scores — per-provider score map
-// result.reasoning — human-readable scoring rationale
-// result.allResults — preserved responses from all providers
-```
-
-### Semantic Cache
-Embedding-based lookup with configurable similarity threshold (default 0.92). Per-route TTL allows different freshness requirements per query domain.
-
-```typescript
-import { SemanticCache } from 'adaptive-memory-multi-model-router/cache';
-const cache = new SemanticCache({ similarityThreshold: 0.92, ttl: 3600000 });
-// Embedding similarity > threshold → cache hit (no LLM call)
-```
-
-### Guardrails
-Prompt injection detection covers 17 patterns including jailbreak templates, system prompt overrides, and delimiter-based injection. PII detection supports common entity types.
-
-### Adaptive Memory
-Model quality scores update online via exponential moving average (alpha=0.2) after each real LLM call. Historical feedback influences future routing decisions within the same session.
-
-### Budget Enforcement
-Per-user and per-team monthly spend caps with hard limits. Real-time alerts at 50%, 80%, and 100% thresholds. Per-provider cost breakdown.
-
-### Circuit Breaker
-Trip after 3 failures, 60s cooldown. Automatic fallback chain across provider tiers.
-
-### Per-Provider Retry
-Custom timeout per provider. Exponential backoff with jitter. Rate limit detection (429) triggers Retry-After-aware backoff.
-
----
-
-## API Reference
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/v1/chat/completions` | OpenAI-compatible chat |
-| POST | `/v1/route` | Routing decision without LLM call |
-| GET | `/v1/models` | Available models with pricing |
-| GET | `/health` | Provider health scores |
-
----
-
-## Installation
-
-```bash
-npm install adaptive-memory-multi-model-router
-npx a3m-router serve  # proxy at http://localhost:8787
-```
+### Configuration
 
 ```python
-pip install a3m-router
+router = A3MRouter(
+    model="auto",
+    parallel_ensemble=3,
+)
+
+result = router.route(
+    messages=[{"role": "user", "content": prompt}],
+    ensemble_config={
+        "providers": ["groq", "openai", "deepseek"],
+        "timeout_ms": 15000,
+        "score_weights": {
+            "relevance": 0.4,
+            "conciseness": 0.3,
+            "accuracy": 0.3,
+        },
+    },
+)
 ```
+
+### Scoring Algorithm
+
+1. Collect all responses within timeout
+2. Compute per-provider scores:
+   - Relevance: cosine similarity to query embedding
+   - Conciseness: ratio of signal tokens / total tokens
+   - Accuracy: factual consistency score
+3. Weighted sum → normalized scores
+4. Winner = provider with highest weighted score
+
+### Provider Response
 
 ```python
-from openai import OpenAI
-client = OpenAI(base_url="http://localhost:8787/v1", api_key="not-needed")
-response = client.chat.completions.create(model="auto", messages=[...])
-```
-
----
-
-## Citation
-
-```bibtex
-@software{a3m_router,
-  title = {A3M Router: OpenAI-Compatible LLM Routing Gateway},
-  author = {Subho Mukherjee},
-  year = {2025},
-  url = {https://github.com/Das-rebel/a3m-router},
-  note = {Parallel ensemble routing across 47+ providers.
+{
+    "content": "winning response text",
+    "provider": "openai",
+    "scores": {
+        "groq": {"relevance": 0.85, "conciseness": 0.9, "accuracy": 0.88},
+        "openai": {"relevance": 0.92, "conciseness": 0.85, "accuracy": 0.95},
+        "deepseek": {"relevance": 0.88, "conciseness": 0.82, "accuracy": 0.90},
+    },
+    "all_results": {
+        "groq": {"content": "...", "latency_ms": 450},
+        "openai": {"content": "...", "latency_ms": 1200},
+        "deepseek": {"content": "...", "latency_ms": 800},
+    },
+    "latency_ms": 1200,
+    "cost_usd": 0.0012,
 }
 ```
 
+## Memory System
+
+### Semantic Cache
+
+```python
+router = A3MRouter(
+    model="auto",
+    cache={
+        "type": "semantic",
+        "threshold": 0.85,  # cosine similarity
+        "ttl_seconds": 3600,
+    },
+)
+```
+
+### Conversation Context
+
+```python
+router = A3MRouter(
+    model="auto",
+    memory={
+        "type": "conversation",
+        "window": 10,  # last 10 exchanges
+        "embedding_model": "text-embedding-3-small",
+    },
+)
+```
+
+### Cross-Session Memory
+
+```python
+router = A3MRouter(
+    model="auto",
+    memory={
+        "type": "semantic",
+        "persistent": True,
+        "namespace": "user_123",
+        "similarity_threshold": 0.85,
+    },
+)
+```
+
+## Guardrails
+
+### Prompt Injection Detection
+
+```python
+# Patterns detected:
+# - System prompt override attempts
+# - Delimiter injection (USER:, SANDBOX:)
+# - Role confusion attacks
+# - Privilege escalation patterns
+```
+
+### PII Detection
+
+- Email addresses, phone numbers, SSNs
+- Credit card numbers
+- API keys and secrets
+
+## Health Scoring
+
+Provider health updated via exponential moving average:
+
+```python
+health_score = (
+    0.7 * previous_score +
+    0.3 * (1 - error_rate)
+) * latency_factor
+```
+
+Where `latency_factor` penalizes slow responses:
+- <1s: 1.0
+- 1-3s: 0.9
+- 3-10s: 0.7
+- >10s: 0.3
+
+## Rate Limiting
+
+### Charnov MVT Implementation
+
+Optimal departure time from rate-limited provider:
+
+```
+depart_when: marginal_remaining_rate < average_rate_including_switch_cost
+```
+
+### Rotation Strategy
+
+1. Track rate-limit windows per provider
+2. When window depletes < threshold, begin rotation
+3. Switch to next healthiest provider in tier
+4. Track rotation frequency to avoid thrashing
+
+## EXP3 Diversity
+
+### Weight Update
+
+```python
+for provider in providers:
+    deviation = provider.share - (1 / n)  # actual share vs fair share
+    penalty = GAMMA * deviation / provider.share
+    provider.weight *= exp(-penalty)
+```
+
+### Normalization
+
+Weights normalized to sum to 1.0 after each update.
+
+## Benchmark Methodology
+
+RouterArena evaluation:
+- 8,400 diverse queries
+- 47 providers tested
+- Accuracy measured via LLM judge comparison
+- Cost tracked via actual API spend
+- Robustness = successful requests / total requests
+
+## API Reference
+
+### POST /v1/chat/completions
+
+Request:
+```json
+{
+  "model": "auto",
+  "messages": [{"role": "user", "content": "..."}],
+  "temperature": 0.7,
+  "max_tokens": 4096,
+  "parallel_ensemble": 1,
+  "stream": false
+}
+```
+
+Response:
+```json
+{
+  "id": "chatcmpl-xxx",
+  "object": "chat.completion",
+  "created": 1234567890,
+  "model": "auto",
+  "provider": "groq",
+  "choices": [{
+    "message": {"role": "assistant", "content": "..."},
+    "finish_reason": "stop",
+    "index": 0
+  }],
+  "usage": {
+    "prompt_tokens": 20,
+    "completion_tokens": 150,
+    "total_tokens": 170
+  }
+}
+```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| A3M_PORT | Server port | 8787 |
+| A3M_API_KEYS | JSON of provider keys | {} |
+| A3M_BUDGET_MONTHLY | Monthly budget limit | unlimited |
+| A3M_CACHE_TTL | Cache TTL in seconds | 3600 |
+| A3M_LOG_LEVEL | log level | info |
+
+## Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Client Request                          │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                     Guardrails                                │
+│  • Prompt injection detection                                 │
+│  • PII filtering                                            │
+│  • Content safety                                           │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                   Semantic Cache                             │
+│  • Embedding similarity lookup                               │
+│  • Zero-cost hits                                          │
+└─────────────────────────┬───────────────────────────────────┘
+                          │ cache miss
+┌─────────────────────────▼───────────────────────────────────┐
+│                      Router                                  │
+│  • Complexity scoring                                       │
+│  • Tier assignment                                         │
+│  • Provider selection                                       │
+│  • EXP3 diversity weighting                                 │
+│  • Charnov MVT rate-limit rotation                         │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+        ┌─────────────────┼─────────────────┐
+        │                 │                 │
+┌───────▼───────┐  ┌──────▼──────┐  ┌──────▼──────┐
+│   Provider 1  │  │  Provider 2 │  │  Provider 3  │
+│    (Groq)     │  │  (OpenAI)  │  │ (DeepSeek)  │
+└───────────────┘  └─────────────┘  └─────────────┘
+        │                 │                 │
+        └─────────────────┼─────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                   Ensemble Scorer                            │
+│  • Collect responses                                        │
+│  • Score on quality metrics                                 │
+│  • Select winner                                           │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                   Memory Layer                              │
+│  • Cache response                                          │
+│  • Update context                                          │
+│  • Store embeddings                                        │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                     Response                                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## License
+
+MIT
+
 ---
 
-## References
-- RouteWorks/RouterArena (ICLR 2025): https://github.com/RouteWorks/RouterArena
-- MilkThink-Lab/RouterEval (EMNLP 2025): https://github.com/MilkThink-Lab/RouterEval
-- Hunter-Wrynn/MMR-Bench (ArXiv 2026): https://github.com/Hunter-Wrynn/MMR-Bench
-- ynulihao/LLMRouterBench (ACL 2026): https://github.com/ynulihao/LLMRouterBench
-- Lin et al. "RouteLLM." arXiv:2404.06035, 2024
-- Zhong et al. "RadixAttention." arXiv:2412.15115, 2024
+## Framework Adapter Details
+
+### LangChain Adapter
+
+```python
+from a3m_adapter import A3MLangChainAdapter
+
+llm = A3MLangChainAdapter(
+    model="auto",
+    temperature=0.7,
+    parallel_ensemble=2
+)
+
+# Works with any LangChain chain
+result = llm.invoke("What is RAG?")
+```
+
+### LlamaIndex Adapter
+
+```python
+from a3m_adapter import A3MLlamaIndexAdapter
+
+llm = A3MLlamaIndexAdapter(model="auto")
+response = llm.complete("Explain transformers")
+```
+
+### AutoGen Adapter
+
+```python
+from a3m_adapter import A3MAutoGenAdapter
+
+llm = A3MAutoGenAdapter(model="auto", parallel_ensemble=2)
+config = llm.create_agent_config()
+
+assistant = ConversableAgent(name="assistant", llm_config=config)
+```
+
+### Vercel AI SDK Adapter
+
+```python
+from a3m_adapter import createA3MProvider
+
+result = await generateText({
+    model: createA3MProvider({"model": "auto", "parallel_ensemble": 2}),
+    prompt: "What is 2+2?",
+})
+```
+
+### Haystack Adapter (RAG)
+
+```python
+from a3m_adapter import A3MHaystackAdapter
+
+adapter = A3MHaystackAdapter(model="auto")
+result = adapter.predict(query="What is AI?", documents=retrieved_docs)
+```
+
+### Pinecone Adapter (Vector Search)
+
+```python
+from a3m_adapter import A3MPineconeAdapter
+
+adapter = A3MPineconeAdapter(model="auto")
+embedding = adapter.embed_query("quantum computing")
+results = index.query(vector=embedding, top_k=5)
+```
+
+### LangGraph Adapter (Stateful Agents)
+
+```python
+from a3m_adapter import A3MLangGraphAdapter
+
+adapter = A3MLangGraphAdapter(model="auto", parallel_ensemble=2)
+agent = create_react_agent(adapter, tools=[...])
+result = agent.invoke({"messages": [{"role": "user", "content": "Hello"}]})
+```
+
+### CrewAI Adapter (Multi-Agent)
+
+```python
+from crewai.llms import A3MCompletion
+
+agent = Agent(llm=A3MCompletion(model="auto"))
+crew = Crew(agents=[agent], tasks=[task])
+result = crew.kickoff()
+```

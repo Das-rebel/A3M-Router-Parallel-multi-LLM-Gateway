@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'a3m-router'
+    static_configs:
+      - targets: ['a3m-router:8787']
+    metrics_path: /metrics

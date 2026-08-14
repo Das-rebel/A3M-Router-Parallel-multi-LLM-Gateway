@@ -4,11 +4,11 @@
   "description": "Best in class open source LLM router across 47+ providers with Evolution-inspired routing: EXP3 diversity, MVT rate-limit rotation, optimal defense theory verification.",
   "main": "src/index.js",
   "bin": {
-    "a3m-router": "./bin/cli.js",
-    "a3m": "./bin/cli.js"
+    "a3m-router": "./dist/cli.js",
+    "a3m": "./dist/cli.js"
   },
   "scripts": {
-    "start": "node bin/cli.js serve",
+    "start": "node dist/cli.js serve",
     "test": "node --test",
     "lint": "eslint src/"
   },

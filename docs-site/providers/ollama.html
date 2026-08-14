@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama Provider — A3M Router</title>
+    <meta name="description" content="Configure Ollama (local LLM inference) with A3M Router. Zero API costs, privacy-first, and configuration guide.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://a3m-router.com/providers/ollama">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header><nav><a href="/">A3M Router</a> · <a href="/providers/">All Providers</a> · <a href="https://github.com/Das-rebel/a3m-router">GitHub</a></nav></header>
+<main>
+<h1>Ollama Provider</h1>
+<p><strong>Cost Tier:</strong> Free (hardware only) · <strong>Rate Limit:</strong> GPU-dependent · <strong>MCP Support:</strong> ✅ Native</p>
+
+<h2>Supported Models</h2>
+<ul>
+<li><strong>LLaMA 3.1</strong> — Meta's open instruction-tuned model (8B, 70B)</li>
+<li><strong>Mistral</strong> — Efficient open model</li>
+<li><strong>Qwen 2.5</strong> — Alibaba's multilingual model</li>
+<li><strong>Phi-3</strong> — Microsoft's efficient small model</li>
+<li><strong>Any GGUF-format model</strong> — Custom model support</li>
+</ul>
+
+<h2>How A3M Router Routes to Ollama</h2>
+<p>Ollama provides completely free, local inference. A3M Router routes to Ollama for:</p>
+<ul>
+<li>Maximum privacy (no data leaves your infrastructure)</li>
+<li>Zero API costs for high-volume simple tasks</li>
+<li>Development and testing without API key requirements</li>
+</ul>
+
+<h2>Configuration</h2>
+<pre><code># Install Ollama, then pull models:
+# ollama pull llama3.1
+# ollama pull mistral
+
+# A3M Router connects to local Ollama at http://localhost:11434
+# No API key required — zero cost for inference</code></pre>
+
+<h2>Requirements</h2>
+<p>GPU recommended for reasonable inference speed. CPU-only works for small models (7B params) but is significantly slower.</p>
+
+<p><a href="/providers/">← All Providers</a></p>
+</main>
+<footer><p>&copy; 2025 A3M Router · <a href="https://github.com/Das-rebel/a3m-router">GitHub</a></p></footer>
+</body>
+</html>

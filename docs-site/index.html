@@ -29,6 +29,64 @@
     <meta name="twitter:description" content="Parallel multi-provider routing with confidence scoring. Semantic cache. 47+ providers. OpenAI-compatible proxy.">
     <meta name="twitter:image" content="https://das-rebel.github.io/adaptive-memory-multi-model-router/assets/og-banner.svg">
 
+    <!-- JSON-LD Structured Data: FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is an LLM router?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "An LLM router is a gateway that intelligently directs queries to the optimal language model provider based on query characteristics, cost, availability, and capability requirements — rather than hardcoding a single provider. This enables cost optimization, automatic failover, and quality maximization on a per-query basis."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does A3M Router differ from sequential fallback?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Most gateways use sequential fallback: try Provider A, fail, try B, fail, try C, succeed, return. The first provider to succeed wins. A3M Router calls multiple providers in parallel and scores every response using weighted signals (domain match, specificity, structure alignment, verb matching, cost tier). The cheapest provider that fully satisfies the query wins — not just the first one that responds successfully."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which providers does A3M Router support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A3M Router supports 47+ providers including OpenAI (GPT-4o, GPT-4o-mini, o1-preview, o1-mini), Anthropic (Claude 3.5 Sonnet, Claude 3 Haiku), Google (Gemini 1.5 Pro, Gemini 1.5 Flash), Groq (LLaMA 3.3 70B, Mixtral 8x7B), Mistral (Mistral Large, Mistral 7B), DeepSeek (DeepSeek V3, DeepSeek Chat), Cerebras (LLaMA 3.3 70B), Ollama (local models), and many more."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How fast is A3M Router?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A3M Router makes routing decisions in sub-millisecond time (typically 0.1–0.5ms) using a keyword-based classifier. The end-to-end latency depends on the selected provider's model. Parallel calls wait for the fastest responders, so ensemble mode often completes faster than sequential fallback."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is A3M Router open source?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. A3M Router is Apache 2.0 licensed and fully open source. The core routing engine, MCP server, Python SDK, and TypeScript/Node.js packages are all available on GitHub at github.com/Das-rebel/a3m-router."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I get started with A3M Router?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "npm install -g adaptive-memory-multi-model-router && a3m-router serve. Then use the OpenAI SDK with base_url: http://localhost:8787/v1. For Python: pip install adaptive-memory-multi-model-router and use the A3MRouter client. Full docs at https://a3m-router.com."
+          }
+        }
+      ]
+    }
+    </script>
+
     <!-- JSON-LD Structured Data: SoftwareApplication -->
     <script type="application/ld+json">
     {
@@ -621,6 +679,7 @@ npx a3m-router serve
             <div class="links">
                 <a href="https://www.npmjs.com/package/adaptive-memory-multi-model-router">NPM</a>
                 <a href="https://github.com/Das-rebel/a3m-router">GitHub</a>
+                <a href="/sitemap.xml">Sitemap</a>
                 <a href="https://github.com/Das-rebel/a3m-router/issues">Issues</a>
                 <a href="https://github.com/Das-rebel/a3m-router/discussions">Discussions</a>
                 <a href="https://github.com/Das-rebel/a3m-router/blob/main/docs/API.md">API Docs</a>

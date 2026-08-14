@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Provider — A3M Router</title>
+    <meta name="description" content="Configure OpenAI (GPT-4o, o1, GPT-4o-mini) with A3M Router. Cost tier, rate limits, models, and configuration guide.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://a3m-router.com/providers/openai">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header><nav><a href="/">A3M Router</a> · <a href="/providers/">All Providers</a> · <a href="https://github.com/Das-rebel/a3m-router">GitHub</a></nav></header>
+<main>
+<h1>OpenAI Provider</h1>
+<p><strong>Cost Tier:</strong> Paid (~$0.002–$15/1M tokens) · <strong>Rate Limit:</strong> Varies by model and tier · <strong>MCP Support:</strong> ✅ Native</p>
+
+<h2>Supported Models</h2>
+<ul>
+<li><strong>GPT-4o</strong> — Latest flagship, multimodal, 128K context</li>
+<li><strong>GPT-4o-mini</strong> — Cost-optimized, fast, same capabilities</li>
+<li><strong>o1-preview</strong> — Reasoning model for complex tasks</li>
+<li><strong>o1-mini</strong> — Reasoning model, lower cost</li>
+<li><strong>GPT-4 Turbo</strong> — Previous flagship, 128K context</li>
+</ul>
+
+<h2>How A3M Router Routes to OpenAI</h2>
+<p>A3M Router automatically detects queries requiring reasoning, coding, or multimodal capabilities and routes them to OpenAI models when the query demands it. OpenAI is typically used for:</p>
+<ul>
+<li>Complex reasoning and chain-of-thought tasks (o1 series)</li>
+<li>Code generation and debugging (GPT-4o)</li>
+<li>Multimodal inputs (images + text)</li>
+<li>High-precision instruction following</li>
+</ul>
+
+<h2>Configuration</h2>
+<pre><code># Set in your environment or .env file
+OPENAI_API_KEY=sk-...
+
+# A3M Router automatically detects and uses OpenAI when appropriate
+# No additional config needed for standard use</code></pre>
+
+<h2>Rate Limits</h2>
+<p>Rate limits vary by OpenAI API tier. A3M Router's MVT (Maximum Value-Targeted) rotation automatically distributes requests across multiple API keys if configured, reducing rate limit impact.</p>
+
+<h2>Cost Optimization Tips</h2>
+<ul>
+<li>Use <code>gpt-4o-mini</code> for simple queries — 60x cheaper than GPT-4o</li>
+<li>Enable semantic caching to avoid repeat API calls</li>
+<li>Route straightforward Q&amp;A to free-tier providers (Groq, Cerebras) and reserve OpenAI for complex tasks</li>
+</ul>
+
+<p><a href="/providers/">← All Providers</a></p>
+</main>
+<footer><p>&copy; 2025 A3M Router · <a href="https://github.com/Das-rebel/a3m-router">GitHub</a></p></footer>
+</body>
+</html>

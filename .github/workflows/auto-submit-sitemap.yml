@@ -1,0 +1,41 @@
+name: Auto-Submit Sitemap
+
+on:
+  schedule:
+    # Run every Monday at 4 AM UTC
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+jobs:
+  sitemap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit sitemap to search engines
+        run: |
+          SITEMAP_URL="https://a3m-router.com/sitemap.xml"
+          echo "=== Sitemap Submission ==="
+
+          # Google
+          echo "[1/3] Submitting to Google..."
+          curl -s -o /dev/null -w "Google: HTTP %{http_code}\n" \
+            "https://www.google.com/ping?sitemap=$SITEMAP_URL"
+
+          # Bing
+          echo "[2/3] Submitting to Bing..."
+          curl -s -o /dev/null -w "Bing: HTTP %{http_code}\n" \
+            "https://www.bing.com/ping?sitemap=$SITEMAP_URL"
+
+          # IndexNow (if key configured)
+          if [ -n "${{ vars.INDEXNOW_KEY }}" ]; then
+            echo "[3/3] Submitting to IndexNow..."
+            curl -s "$SITEMAP_URL" | grep -oP '(?<=<loc>)[^<]+' | while read -r url; do
+              curl -s -o /dev/null -w "IndexNow: $url → HTTP %{http_code}\n" -X POST \
+                "https://indexnow.org/ping" \
+                -H "Content-Type: text/plain" \
+                -d "url=$url&key=${{ vars.INDEXNOW_KEY }}"
+            done
+          else
+            echo "[3/3] Skipped: INDEXNOW_KEY not configured"
+          fi
+        env:
+          SITEMAP_URL: https://a3m-router.com/sitemap.xml

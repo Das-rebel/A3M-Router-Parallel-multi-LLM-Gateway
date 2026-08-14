@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerebras Provider — A3M Router</title>
+    <meta name="description" content="Configure Cerebras (LLaMA 3.3 70B, fastest inference) with A3M Router. Free tier, ultra-fast, and configuration guide.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://a3m-router.com/providers/cerebras">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header><nav><a href="/">A3M Router</a> · <a href="/providers/">All Providers</a> · <a href="https://github.com/Das-rebel/a3m-router">GitHub</a></nav></header>
+<main>
+<h1>Cerebras Provider</h1>
+<p><strong>Cost Tier:</strong> Free tier available · <strong>Rate Limit:</strong> Generous free tier · <strong>MCP Support:</strong> ✅ Native</p>
+
+<h2>Supported Models</h2>
+<ul>
+<li><strong>LLaMA 3.3 70B</strong> — Meta's latest, served on Cerebras hardware</li>
+<li><strong>LLaMA 3.1 8B</strong> — Fast, lightweight option</li>
+<li><strong>Mistral 7B</strong> — Efficient open model</li>
+</ul>
+
+<h2>How A3M Router Routes to Cerebras</h2>
+<p>Cerebras provides <strong>ultra-fast inference</strong> on large models through its wafer-scale hardware. A3M Router routes here for:</p>
+<ul>
+<li>Latency-critical simple queries</li>
+<li>High-volume free-tier tasks</li>
+<li>Situations where Groq's rate limits are hit</li>
+</ul>
+
+<h2>Configuration</h2>
+<pre><code>CEREBRAS_API_KEY=ccke_...
+
+# Cerebras free tier: generous daily allocation
+# Fastest inference available for LLaMA-class models</code></pre>
+
+<p><a href="/providers/">← All Providers</a></p>
+</main>
+<footer><p>&copy; 2025 A3M Router · <a href="https://github.com/Das-rebel/a3m-router">GitHub</a></p></footer>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anthropic Provider — A3M Router</title>
+    <meta name="description" content="Configure Anthropic Claude models with A3M Router. Claude 3.5 Sonnet, Claude 3 Haiku, rate limits, and configuration.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://a3m-router.com/providers/anthropic">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header><nav><a href="/">A3M Router</a> · <a href="/providers/">All Providers</a> · <a href="https://github.com/Das-rebel/a3m-router">GitHub</a></nav></header>
+<main>
+<h1>Anthropic Provider</h1>
+<p><strong>Cost Tier:</strong> Paid (~$0.003–$15/1M tokens) · <strong>Rate Limit:</strong> Varies by tier · <strong>MCP Support:</strong> ✅ Native</p>
+
+<h2>Supported Models</h2>
+<ul>
+<li><strong>Claude 3.5 Sonnet</strong> — Current flagship, best for coding, analysis, and long documents</li>
+<li><strong>Claude 3.5 Haiku</strong> — Fast, cost-efficient, for simple tasks</li>
+<li><strong>Claude 3 Opus</strong> — Maximum capability, slower and more expensive</li>
+<li><strong>Claude 3 Sonnet</strong> — Previous generation, good balance</li>
+</ul>
+
+<h2>How A3M Router Routes to Anthropic</h2>
+<p>Anthropic models are preferred for:</p>
+<ul>
+<li>Long-form content generation and summarization</li>
+<li>Complex coding and debugging tasks (Claude 3.5 Sonnet excels here)</li>
+<li>Safe, helpful assistant interactions</li>
+<li>Document analysis with large context windows (200K for Claude 3.5)</li>
+</ul>
+
+<h2>Configuration</h2>
+<pre><code>ANTHROPIC_API_KEY=sk-ant-...
+
+# Anthropic models are automatically selected when query analysis
+# indicates high-quality long-form output or coding tasks</code></pre>
+
+<p><a href="/providers/">← All Providers</a></p>
+</main>
+<footer><p>&copy; 2025 A3M Router · <a href="https://github.com/Das-rebel/a3m-router">GitHub</a></p></footer>
+</body>
+</html>

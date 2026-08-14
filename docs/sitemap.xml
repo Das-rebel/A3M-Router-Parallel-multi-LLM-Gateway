@@ -1,69 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://a3m-router.com/</loc>
+    <loc>https://das-rebel.github.io/a3m-router/</loc>
     <priority>1.0</priority>
     <changefreq>weekly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
   <url>
-    <loc>https://a3m-router.com/blog/best-llm-routers-2025</loc>
+    <loc>https://das-rebel.github.io/a3m-router/best-llm-routers-2025.html</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
   <url>
-    <loc>https://a3m-router.com/providers/</loc>
-    <priority>0.7</priority>
+    <loc>https://das-rebel.github.io/a3m-router/quick-start.html</loc>
+    <priority>0.9</priority>
     <changefreq>weekly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
   <url>
-    <loc>https://a3m-router.com/providers/openai/</loc>
+    <loc>https://das-rebel.github.io/a3m-router/openai.html</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
   <url>
-    <loc>https://a3m-router.com/providers/anthropic/</loc>
+    <loc>https://das-rebel.github.io/a3m-router/anthropic.html</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
   <url>
-    <loc>https://a3m-router.com/providers/google/</loc>
+    <loc>https://das-rebel.github.io/a3m-router/google.html</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
   <url>
-    <loc>https://a3m-router.com/providers/groq/</loc>
+    <loc>https://das-rebel.github.io/a3m-router/groq.html</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
   <url>
-    <loc>https://a3m-router.com/providers/mistral/</loc>
+    <loc>https://das-rebel.github.io/a3m-router/mistral.html</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
   <url>
-    <loc>https://a3m-router.com/providers/ollama/</loc>
+    <loc>https://das-rebel.github.io/a3m-router/ollama.html</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
   <url>
-    <loc>https://a3m-router.com/providers/deepseek/</loc>
+    <loc>https://das-rebel.github.io/a3m-router/deepseek.html</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
   <url>
-    <loc>https://a3m-router.com/providers/cerebras/</loc>
+    <loc>https://das-rebel.github.io/a3m-router/cerebras.html</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2026-08-14</lastmod>
   </url>
 </urlset>

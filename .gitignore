@@ -13,3 +13,9 @@ awesome-ai-gateways/
 awesome-selfhosted/
 media/
 .env
+*.egg-info/
+python/dist/
+dist/
+build/
+*.pyc
+python/__pycache__/

@@ -1,6 +1,6 @@
 {
   "name": "adaptive-memory-multi-model-router",
-  "version": "2.15.4",
+  "version": "2.15.5",
   "description": "Best in class open source LLM router across 47+ providers with Evolution-inspired routing: EXP3 diversity, MVT rate-limit rotation, optimal defense theory verification.",
   "main": "src/index.js",
   "bin": {

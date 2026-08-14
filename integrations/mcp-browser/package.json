@@ -1,0 +1,38 @@
+{
+  "name": "a3m-mcp-browser",
+  "version": "1.0.0",
+  "description": "A3M Router MCP server for browser automation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "a3m-mcp-browser": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js"
+  },
+  "dependencies": {
+    "adaptive-memory-multi-model-router": "^2.14.0",
+    "@modelcontextprotocol/sdk": "^0.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "a3m",
+    "browser-automation",
+    "llm-routing",
+    "claude",
+    "cursor",
+    "n8n"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Das-rebel/a3m-router"
+  },
+  "author": "Subhojit Das",
+  "license": "MIT"
+}

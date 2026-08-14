@@ -1,0 +1,34 @@
+{
+  "name": "a3m-sota-browser",
+  "version": "1.0.0",
+  "description": "A3M Router + sota-browser integration for stealth browser automation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "adaptive-memory-multi-model-router": "^2.14.0",
+    "sota-browser": "^1.7.0"
+  },
+  "peerDependencies": {
+    "sota-browser": "^1.7.0"
+  },
+  "keywords": [
+    "a3m",
+    "sota-browser",
+    "cloakbrowser",
+    "browser-automation",
+    "stealth",
+    "anti-detection",
+    "llm-routing",
+    "cost-optimization"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Das-rebel/a3m-router"
+  },
+  "author": "Subhojit Das",
+  "license": "MIT"
+}

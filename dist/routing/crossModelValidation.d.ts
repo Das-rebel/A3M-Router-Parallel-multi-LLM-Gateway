@@ -8,4 +8,3 @@ export interface ValidationResult {
 export declare function validateRouting(query: string, selectedProvider: string, selectedModel: string, options?: {
     validatorProvider?: string;
 }): Promise<ValidationResult>;
-//# sourceMappingURL=crossModelValidation.d.ts.map

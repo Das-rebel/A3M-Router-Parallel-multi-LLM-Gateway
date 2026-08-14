@@ -1,0 +1,280 @@
+/* A3M Router Cost Calculator Styles */
+
+:root {
+  --a3m-primary: #6366f1;
+  --a3m-accent: #818cf8;
+  --a3m-bg: #0f0f1a;
+  --a3m-surface: #1a1a2e;
+  --a3m-border: #2d2d4a;
+  --a3m-text: #e2e8f0;
+  --a3m-muted: #94a3b8;
+  --a3m-green: #22c55e;
+  --a3m-red: #ef4444;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--a3m-bg);
+  color: var(--a3m-text);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--a3m-muted);
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: var(--a3m-surface);
+  border: 1px solid var(--a3m-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--a3m-muted);
+  margin-bottom: 1rem;
+}
+
+/* Input grid */
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .input-grid { grid-template-columns: 1fr; }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--a3m-muted);
+}
+
+.input-group input,
+.input-group select {
+  padding: 0.625rem 0.875rem;
+  background: var(--a3m-bg);
+  border: 1px solid var(--a3m-border);
+  border-radius: 8px;
+  color: var(--a3m-text);
+  font-size: 1rem;
+  width: 100%;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: var(--a3m-primary);
+}
+
+/* Model mix rows */
+.model-mix {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.model-row {
+  display: grid;
+  grid-template-columns: 1fr 100px auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.model-row select,
+.model-row input {
+  padding: 0.5rem;
+  background: var(--a3m-bg);
+  border: 1px solid var(--a3m-border);
+  border-radius: 6px;
+  color: var(--a3m-text);
+  font-size: 0.875rem;
+}
+
+.model-row span {
+  color: var(--a3m-muted);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: var(--a3m-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn:hover { background: var(--a3m-accent); }
+.btn-secondary {
+  background: var(--a3m-border);
+  color: var(--a3m-text);
+}
+.btn-secondary:hover { background: #3d3d5a; }
+
+.btn-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* Results */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .results-grid { grid-template-columns: 1fr; }
+}
+
+.result-card {
+  background: var(--a3m-bg);
+  border: 1px solid var(--a3m-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.result-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--a3m-muted);
+  margin-bottom: 0.5rem;
+}
+
+.result-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.result-value.savings { color: var(--a3m-green); }
+.result-value.baseline { color: var(--a3m-muted); text-decoration: line-through; }
+
+/* Breakdown table */
+.breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.breakdown-table th {
+  text-align: left;
+  padding: 0.625rem 0.75rem;
+  color: var(--a3m-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--a3m-border);
+}
+
+.breakdown-table td {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--a3m-border);
+}
+
+.breakdown-table tr:last-child td { border-bottom: none; }
+.breakdown-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.breakdown-table .savings-cell { color: var(--a3m-green); }
+
+/* Share bar */
+.share-bar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.share-bar input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: var(--a3m-bg);
+  border: 1px solid var(--a3m-border);
+  border-radius: 6px;
+  color: var(--a3m-text);
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+
+/* Chart */
+.chart-container {
+  position: relative;
+  height: 250px;
+  margin: 1.5rem 0;
+}
+
+.chart-bar {
+  position: absolute;
+  bottom: 0;
+  width: 40%;
+  border-radius: 6px 6px 0 0;
+  transition: height 0.5s ease;
+}
+
+.chart-bar.baseline {
+  left: 15%;
+  background: var(--a3m-muted);
+  opacity: 0.5;
+}
+
+.chart-bar.a3m {
+  right: 15%;
+  background: var(--a3m-primary);
+}
+
+/* Hidden until calculated */
+.hidden { display: none; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  color: var(--a3m-muted);
+  font-size: 0.75rem;
+  margin-top: 2rem;
+}
+
+.footer a { color: var(--a3m-accent); text-decoration: none; }

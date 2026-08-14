@@ -1,0 +1,46 @@
+{
+  "name": "a3m-vercel-ai",
+  "version": "0.1.0",
+  "description": "A3M Router provider for Vercel AI SDK - intelligent cost-based routing with parallel execution",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "ai": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ai": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "vercel",
+    "ai",
+    "sdk",
+    "router",
+    "llm",
+    "cost-optimization",
+    "a3m"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Das-rebel/a3m-router"
+  }
+}

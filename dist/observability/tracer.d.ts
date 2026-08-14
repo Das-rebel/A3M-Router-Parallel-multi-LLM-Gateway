@@ -55,4 +55,3 @@ export declare class Tracer extends EventEmitter {
 export declare function getTracer(): Tracer;
 export declare function createTracer(): Tracer;
 export {};
-//# sourceMappingURL=tracer.d.ts.map

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "a3m-mcp-server"
+version = "1.0.0"
+description = "MCP server for A3M Router — parallel multi-LLM execution for AI agents"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.24.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4.0", "pytest-asyncio>=0.21.0", "black>=23.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/Das-rebel/a3m-router"
+
+[tool.setuptools.packages.find]
+where = ["."]

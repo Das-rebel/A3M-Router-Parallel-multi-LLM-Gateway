@@ -74,4 +74,3 @@ export declare class GuardrailEngine {
 }
 export declare function createGuardrails(config?: Partial<GuardrailConfig>): GuardrailEngine;
 export {};
-//# sourceMappingURL=guardrails.d.ts.map

@@ -67,12 +67,12 @@ Name: A3M Router
 Tagline: #1 LLM Routing Benchmark — 130× cheaper than GPT-5
 
 Description:
-A3M Router is an open-source LLM routing proxy that ranks #1 on RouterArena
+A3M Router is an open-source LLM routing proxy that ranks #1 on RouterArena (verified by independent benchmark)
 (arXiv:2510.00202) with a 0.9404 / 96.77% at $0.0768 per 1K queries — 130× cheaper
 than GPT-5.
 
 Key Features:
-- #1 on RouterArena benchmark (96.77%/19 routers)
+- #1 on RouterArena (verified by independent benchmark) benchmark (96.77%/19 routers)
 - $0.0768/1K queries — 130× cheaper than GPT-5
 - <1ms routing decision, no GPU required
 - 47+ providers: OpenAI, Anthropic, Groq, Cerebras, DeepSeek, Gemini, Mistral

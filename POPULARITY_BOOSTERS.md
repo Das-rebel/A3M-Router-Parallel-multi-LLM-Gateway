@@ -248,7 +248,7 @@
 - GitHub Trending: Possible feature
 
 ### Long Term (3 months)
-- Established as #1 LLM routing package
+- Established as a leading LLM routing package
 - 10,000+ weekly downloads
 - 1,000+ GitHub stars
 - Community contributions

@@ -23,6 +23,72 @@ const providerConfig_1 = require("../providers/providerConfig");
 const tokenUtils_1 = require("../utils/tokenUtils");
 const costUtils_1 = require("../utils/costUtils");
 const sorting_1 = require("../utils/sorting");
+// ============================================================
+// TRAFFIC SHARES FOR ADAPTIVE DIVERSITY WEIGHT (EXP3-inspired)
+// Based on negative frequency-dependent selection — as provider i's traffic
+// share f_i grows above uniform (1/n), impose a diversity penalty.
+// Formula: gamma = sqrt(n * log(n) / (T * G^2))  [Auer et al. 2002, EXP3]
+// diversityPenalty_i = gamma * (f_i - 1/n)
+// ============================================================
+/** Number of times each provider has been selected (cumulative) */
+const _selectionCount = {};
+/** Total routing decisions since last reset */
+let _totalDecisions = 0;
+/** Reward range estimate for gamma computation (quality_score scale 0-1) */
+const _REWARD_RANGE = 1.0;
+/**
+ * Compute the EXP3-inspired diversity penalty for a provider.
+ * Based on: Auer et al. 2002 — "The Nonstochastic Multiarmed Bandit Problem"
+ * and the insight that as provider share f_i grows above uniform (1/n),
+ * imposing a penalty proportional to (f_i - 1/n) prevents monoculture
+ * (competitive exclusion — negative frequency-dependent selection).
+ *
+ * @param providerName - provider key
+ * @param nProviders - total number of available providers
+ * @param recentDecayFactor - optional decay for non-stationary environments
+ */
+function computeDiversityPenalty(providerName, nProviders, recentDecayFactor = 0.0) {
+    if (nProviders < 2)
+        return 0;
+    if (_totalDecisions < 2)
+        return 0;
+    const share = _selectionCount[providerName] || 0;
+    const uniform = 1.0 / nProviders;
+    // Deviation from uniform distribution (can be negative if under-used)
+    const deviation = share - uniform;
+    if (Math.abs(deviation) < 1e-6)
+        return 0;
+    // EXP3 learning rate: gamma = sqrt(n * log(n) / (T * G^2))
+    // G = reward range (quality_score in [0,1] → G = 1)
+    const T = Math.max(_totalDecisions, 10);
+    const gamma = Math.sqrt((nProviders * Math.log(nProviders)) / (T * _REWARD_RANGE * _REWARD_RANGE));
+    // Clamp gamma to prevent extreme penalties when T is very small
+    const clampedGamma = Math.min(gamma, 0.5);
+    // Optional: decay factor for non-stationary environments
+    // (higher share = stronger penalty, but decays over time)
+    // Currently disabled (recentDecayFactor=0) — re-enable if providers change frequently
+    const effectiveGamma = clampedGamma * (1.0 - recentDecayFactor);
+    // Penalty is proportional to how far above uniform the provider's share is
+    // (negative deviation = under-used = reward, not penalty)
+    if (deviation <= 0)
+        return 0; // Reward already captured implicitly by below-uniform penalty
+    return effectiveGamma * deviation;
+}
+/**
+ * Record that a provider was selected (call after each routing decision).
+ * Used to compute the diversity penalty on subsequent decisions.
+ */
+function recordSelection(providerName) {
+    _selectionCount[providerName] = (_selectionCount[providerName] || 0) + 1;
+    _totalDecisions += 1;
+}
+/**
+ * Reset traffic tracking (call when provider pool changes or for eval resets).
+ */
+function resetDiversityState() {
+    Object.keys(_selectionCount).forEach(k => delete _selectionCount[k]);
+    _totalDecisions = 0;
+}
 let cachedProfiles = null;
 let cacheTimestamp = 0;
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -688,6 +754,22 @@ function routeQuery(prompt, available_models, budget_multiplier = 1.0) {
         : 0;
     const scoreFn = (c) => c.quality_score * complexity_bias + c.cost_score * (1 - complexity_bias);
     let topCandidates = (0, sorting_1.quickselectTopK)(candidates, 4, scoreFn);
+    // === DIVERSITY PENALTY (EXP3-inspired, negative frequency-dependence) ===
+    // As provider share f_i grows above uniform (1/n), impose a diversity penalty.
+    // This prevents provider monoculture (competitive exclusion) — the core insight
+    // from the Paradox of the Plankton / negative frequency-dependent selection.
+    // Penalty is applied only to the quality dimension (complexity_bias-weighted),
+    // since cost already naturally distributes across providers.
+    // See: Auer et al. 2002, "The Nonstochastic Multiarmed Bandit Problem"
+    const nProviders = candidates.length;
+    for (const c of candidates) {
+        const divPenalty = computeDiversityPenalty(c.name, nProviders);
+        // Diversity penalty applies to quality dimension only (cost already disperses traffic)
+        c.total_score -= divPenalty * complexity_bias;
+    }
+    // Re-rank after diversity adjustment
+    candidates.sort((a, b) => b.total_score - a.total_score);
+    topCandidates = candidates.slice(0, 4);
     // Adaptive quality floor: for complex queries, prefer models above the floor
     if (adaptiveQualityFloor > 0) {
         const qualified = topCandidates.filter(c => c.quality_score >= adaptiveQualityFloor);
@@ -698,6 +780,8 @@ function routeQuery(prompt, available_models, budget_multiplier = 1.0) {
     }
     const primary = topCandidates[0];
     const secondary = topCandidates.slice(1, 3);
+    // Record selection for diversity tracking (after final decision, before return)
+    recordSelection(primary.name);
     // Calculate confidence based on score gap
     let confidence = 0.5;
     if (candidates.length > 1) {

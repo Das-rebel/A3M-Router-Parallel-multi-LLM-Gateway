@@ -1,6 +1,6 @@
-# A3M Router 🔀 — LLM路由基准测试#1 & 最便宜的带记忆路由器
+# A3M Router 🔀 — 最便宜的LLM路由 & 并行执行
 
-**🏆 RouterArena #1: Accuracy, Cost & Robustness (96.77%分) · 最便宜 $0.0768/1K请求 · 47家提供商并行执行**
+**💰 $0.0768/1K请求 · 80+提供商 · 带记忆路由**
 
 [English](./README.md) | [日本語](./README_ja.md) | [中文](./README_zh.md)
 
@@ -8,11 +8,9 @@
 
 | 指标 | A3M Router | Sqwish | Azure (微软) | GPT-5 (OpenAI) | RouteLLM (伯克利) |
 |------|:-----------:|:------:|:------------:|:--------------:|:-----------------:|
-| **排名** | **🏆 #1** | #2 | #3 | #4 | #5 |
-| **评分** | **96.77%** | 75.27 | 71.87 | 64.32 | 48.07 |
 | **成本** | **$0.0768** | $0.18 | $0.22 | $10.02 | $0.27 |
 
-> 在RouterArena官方基准测试中获得最高分和最低成本，由独立评估管道验证 (arXiv:2510.00202)
+> 带记忆功能的LLM路由器，独立评估验证
 
 ## 独特优势：并行多LLM执行
 
@@ -36,9 +34,8 @@ A3M路由:  模型A ║ 模型B ║ 模型C → 评分选最佳 ✅  (1次延迟
 
 ## 核心功能
 
-- 🏆 **RouterArena #1** — 19个路由器中排名第一
 - 🔀 **并行多LLM执行** — 同时运行多个提供商，置信度投票选最佳
-- 💰 **最便宜** — $0.0768/1K请求，比#2便宜4倍
+- 💰 **最便宜** — $0.0768/1K请求
 - 🧠 **带记忆的路由** — 情景记忆跨会话保存，越用越懂你
 - 🔄 **语义缓存** — 30%+命中率，节省成本
 - 🛡️ **预算强制** — 每查询成本追踪，防止超支
@@ -71,26 +68,25 @@ const router = createRouter({
 
 // 第一次对话
 await router.route('我叫小明');           // 记住：用户叫小明
-// 第二次对话  
+// 第二次对话
 await router.route('我叫什么？');         // 回复：你叫小明！
 ```
 
 ## 基准测试结果
 
-| 路由器 | 评分 | 成本/1K | 开源 |
-|--------|:----:|:-------:|:----:|
-| **A3M Router** | **96.77%** | **$0.0768** | ✅ |
-| Sqwish | 75.27 | $0.18 | ❌ |
-| Azure-Model-Router | 71.87 | $0.22 | ❌ |
-| GPT-5 | 64.32 | $10.02 | ❌ |
-| RouteLLM | 48.07 | $0.27 | ✅ |
+| 路由器 | 成本/1K | 开源 |
+|--------|:-------:|:----:|
+| **A3M Router** | **$0.0768** | ✅ |
+| Sqwish | $0.18 | ❌ |
+| Azure-Model-Router | $0.22 | ❌ |
+| GPT-5 | $10.02 | ❌ |
+| RouteLLM | $0.27 | ✅ |
 
-详见 [BENCHMARK.md](./docs/BENCHMARK.md) · [RouterArena PR #144](https://github.com/RouteWorks/RouterArena/pull/144)
+详见 [BENCHMARK.md](./docs/BENCHMARK.md)
 
 ## 链接
 
 - 📖 [文档](https://das-rebel.github.io/a3m-router/)
-- 🏆 [基准测试](https://das-rebel.github.io/a3m-router/benchmark)
 - 🚀 [快速开始](https://das-rebel.github.io/a3m-router/quick-start)
 - 🤖 [API参考](https://das-rebel.github.io/a3m-router/api)
 - 💬 [讨论区](https://github.com/Das-rebel/a3m-router/discussions)

@@ -69,4 +69,3 @@ export declare class ObsidianVault {
     cleanOldFiles(): Promise<number>;
 }
 export default ObsidianVault;
-//# sourceMappingURL=obsidianVault.d.ts.map

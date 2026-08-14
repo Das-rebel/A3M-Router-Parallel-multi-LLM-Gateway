@@ -14,7 +14,13 @@
 ### Changed
 - Cleanup removed 4 unused deps, fixed 0 vulns, deduplicated
 
-## [2.14.0] — 2026-05-28
+## [2.16.0] — 2026-08-12
+
+### Added
+- **80+ providers** (up from 36): Cloudflare Workers AI, HuggingFace Inference, Modal, Lepton AI, NVIDIA NIM, Baseten, RunPod, Predibase, Featherless AI, Abacus AI, Hyperbolic, Stability AI, SiliconFlow, Yandex GPT, Tencent Hunyuan, VolcEngine (Doubao), Baidu Qianfan, Kuaishou, 360 AI, Naver Clova, Kakao Brain, Upstage, SkyFire, LIVEPEOPLE, Scale AI, Titanium Network, Aizel Cloud, Poe, Phind, Banana, Forefront AI, You.com, Komo, Shine AI, AIDE Labs, Writer API, Databricks, La Plateforme, and more
+
+### Changed
+- Provider expansion: 36 → 80+ providers across free, cheap, mid, premium, and enterprise tiers — 2026-05-28
 
 ### Added
 - MCP server for AI agent integration

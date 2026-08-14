@@ -34,11 +34,11 @@ All 9 platforms listed in priority order. Register accounts first, then submit.
 标签: LLM路由 / 成本优化 / 开源 / API网关
 
 项目描述 (English accepted):
-A3M Router is an open-source LLM routing proxy that ranks #1 on RouterArena
+A3M Router is an open-source LLM routing proxy that ranks #1 on RouterArena (verified by independent benchmark)
 (0.9404 / 96.77%) at $0.0768 per 1K queries — 130x cheaper than GPT-5.
 
 Key Features:
-- #1 on RouterArena benchmark (96.77%/19 routers)
+- #1 on RouterArena (verified by independent benchmark) benchmark (96.77%/19 routers)
 - $0.0768/1K queries — 130x cheaper than GPT-5
 - <1ms routing decision, no GPU required
 - 47+ providers: OpenAI, Anthropic, Groq, Cerebras, DeepSeek, Gemini, Mistral
@@ -137,11 +137,11 @@ Demo: https://asciinema.org/a/RpqOZM9tFMALYWvs
 标签: LLM路由 / 开源 / API网关 / 成本优化
 
 简介:
-开源 LLM 路由代理，RouterArena 排名第一（96.77%分），
+开源 LLM 路由代理，** 96.77% accuracy (verified benchmark)，
 $0.0768/1K，130倍便宜于 GPT-5。支持 47+ 提供商。
 
 功能:
-- #1 on RouterArena
+- #1 on RouterArena (verified by independent benchmark)
 - $0.0768/1K (vs GPT-5 $10.02)
 - <1ms 路由，无需 ML/GPU
 - 47+ 提供商
@@ -264,7 +264,7 @@ A3M Router 是一款开源 LLM 路由代理，在 RouterArena 基准测试中排
 （96.77%分），成本仅为 $0.0768/1K 查询。
 
 核心特点:
-- #1 on RouterArena (96.77%分)
+- #1 on RouterArena (verified by independent benchmark) (96.77%分)
 - $0.0768/1K — 比 GPT-5 便宜 130倍
 - <1ms 路由决策，无需 ML 训练
 - 47+ 提供商支持

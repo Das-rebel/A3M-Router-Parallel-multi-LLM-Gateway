@@ -1,6 +1,6 @@
-# Show HN: I built an open-source LLM router that routes to the cheapest provider at 96.77% RouterArena accuracy — 200× cheaper than GPT-5
+# Show HN: I built an open-source LLM router that routes to the cheapest provider — 200× cheaper than GPT-5
 
-**TL;DR:** I was spending $800/month on LLM APIs. Half of those calls were GPT-4o answering "what is 2+2?" So I built a router that calls multiple providers in parallel and picks the best answer. It ranked #1 on RouterArena, the official LLM routing benchmark.
+**TL;DR:** I was spending $800/month on LLM APIs. Half of those calls were GPT-4o answering "what is 2+2?" So I built a router that calls multiple providers in parallel and picks the best answer. It routes simple queries to free/cheap providers and complex ones to premium — automatically.
 
 **Try it right now:**
 ```bash
@@ -40,35 +40,31 @@ const result = await a3mRouter.route({
   messages: [{ role: 'user', content: 'Explain quantum computing' }]
 });
 // → Routes to cheapest capable provider
-// → Score: 96.77% on RouterArena benchmark
+// → Automatically handles complexity classification
 ```
 
-## Benchmark Results (RouterArena)
+## Cost Comparison
 
-RouterArena (arXiv:2510.00202) evaluated 8,400 queries across 9 domains. Official leaderboard:
-
-| Router | Score | Cost/1K tokens |
-|--------|:-----:|:--------------:|
-| 🥇 **A3M Router** | **96.77%** | **$0.0768** |
-| 🥈 Sqwish | 75.27 | $0.180 |
-| 🥉 Azure | 71.87 | $0.220 |
-| GPT-5 (OpenAI) | 64.32 | $10.020 |
-| RouteLLM (Berkeley) | 48.07 | $0.270 |
-
-A3M is #1 among cost-aware routers. Cheapest by **4.7×** vs the next cost-aware router. And it scores **higher** than GPT-5 at **200× lower cost**.
+| Router | Cost/1K tokens | Open Source |
+|--------|:--------------:|:----------:|
+| **A3M Router** | **$0.0768** | ✅ |
+| Sqwish | $0.18 | ❌ |
+| Azure | $0.22 | ❌ |
+| GPT-5 (OpenAI) | $10.02 | ❌ |
+| RouteLLM (Berkeley) | $0.27 | ✅ |
 
 **The math:** $1,000/month on LLM APIs → ~$5/month with A3M at equivalent quality.
 
 ## Real Overhead Numbers
 
-Every gateway says "negligible overhead." We ran third-party benchmarks and published ours:
+Every gateway says "negligible overhead." We measured ours:
 
 | Setup | Latency | What's included |
 |:------|:-------:|:----------------|
 | Direct to provider | 138ms | Raw API call |
 | Through A3M | 374ms | Routing + parallel calls + scoring + cache |
 
-236ms overhead. We don't pretend it's zero. But at 100K queries/month, the 62% cost savings = **~$2,600/year**. The latency pays for itself.
+236ms overhead. The cost savings dwarf it at scale.
 
 ## Features
 
@@ -114,7 +110,7 @@ Benchmark data: **[https://das-rebel.github.io/a3m-router/benchmark](https://das
 
 **[https://github.com/Das-rebel/a3m-router](https://github.com/Das-rebel/a3m-router)**
 
-MIT license. PR for RouterArena pending review at [RouteWorks/RouterArena#113](https://github.com/RouteWorks/RouterArena/pull/144).
+MIT license.
 
 ---
 
@@ -128,9 +124,9 @@ MIT license. PR for RouterArena pending review at [RouteWorks/RouterArena#113](h
 >
 > **"10K downloads in 14 days with zero marketing?"** — Yeah, devs found it on npm, tried it, and told their team. The 62% savings pitch sells itself.
 >
-> **"What about latency?"** — We published third-party benchmark numbers above. The overhead is real but the cost savings dwarf it at scale.
+> **"What about latency?"** — We published benchmark numbers above. The overhead is real but the cost savings dwarf it at scale.
 >
-> Happy to answer questions about the routing algorithm, the benchmark, or how to integrate it into your stack.
+> Happy to answer questions about the routing algorithm or how to integrate it into your stack.
 
 ---
 

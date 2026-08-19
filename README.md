@@ -9,6 +9,11 @@
 [![Tests](https://img.shields.io/badge/Tests-28%2F28%20passing-brightgreen)](https://github.com/Das-rebel/a3m-router/actions)
 [![GitHub stars](https://img.shields.io/github/stars/Das-rebel/a3m-router)](https://github.com/Das-rebel/a3m-router/stargazers)
 
+**📦 Available on:**
+[![npm](https://img.shields.io/badge/npm-6%2C000%2B%2Fmonth-CB3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/adaptive-memory-multi-model-router) 
+[![PyPI](https://img.shields.io/badge/PyPI-700%2Fmonth-3776AB?style=flat-square&logo=pypi)](https://pypi.org/project/a3m-router/) 
+[![GitHub](https://img.shields.io/badge/GitHub-14%20%E2%98%85-100000?style=flat-square&logo=github)](https://github.com/Das-rebel/a3m-router/stargazers)
+
 A3M Router automatically picks the cheapest capable model for each request. No code changes needed. Just swap your API endpoint.
 
 ---

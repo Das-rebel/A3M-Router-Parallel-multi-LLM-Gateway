@@ -61,10 +61,13 @@ adapters = [
 dev = ["pytest>=7.4.0", "pytest-asyncio>=0.21.0", "black>=23.0.0"]
 
 [project.urls]
-Homepage = "https://github.com/Das-rebel/a3m-router"
-Documentation = "https://das-rebel.github.io/a3m-router"
+Homepage = "https://github.com/Das-rebel/a3m-router#a3m-router"
+Documentation = "https://github.com/Das-rebel/a3m-router#readme"
 Repository = "https://github.com/Das-rebel/a3m-router"
 Changelog = "https://github.com/Das-rebel/a3m-router/releases"
+"NPM Package" = "https://www.npmjs.com/package/adaptive-memory-multi-model-router"
+"PyPI Package" = "https://pypi.org/project/a3m-router/"
+"GitHub Stars" = "https://github.com/Das-rebel/a3m-router/stargazers"
 
 [tool.setuptools.packages.find]
 where = ["."]

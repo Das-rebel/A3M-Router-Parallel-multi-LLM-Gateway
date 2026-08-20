@@ -1,7 +1,7 @@
 {
   "name": "adaptive-memory-multi-model-router",
   "version": "2.15.5",
-  "description": "\ud83e\udd16 A3M Router: Intelligent LLM routing gateway - 14% faster than OpenRouter, 92% cheaper | 80+ providers | npm: 6K+/mo | PyPI: 700+/mo | https://github.com/Das-rebel/a3m-router",
+  "description": "🤖 A3M Router: Intelligent LLM routing gateway - 14% faster than OpenRouter, 92% cheaper | 80+ providers | npm: 6K+/mo | PyPI: 700+/mo | https://github.com/Das-rebel/a3m-router",
   "main": "src/index.js",
   "bin": {
     "a3m-router": "./dist/cli.js",
@@ -53,8 +53,7 @@
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.2.0",
-    "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
+    "typescript": "^7.0.2"
   },
   "funding": {
     "type": "github",
@@ -63,6 +62,6 @@
   "bugs": {
     "url": "https://github.com/Das-rebel/a3m-router/issues"
   },
-  "py\u6fee": "https://pypi.org/project/a3m-router/",
+  "py濮": "https://pypi.org/project/a3m-router/",
   "readme": "https://github.com/Das-rebel/a3m-router/blob/main/README.md"
 }

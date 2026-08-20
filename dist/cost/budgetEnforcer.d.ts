@@ -106,3 +106,4 @@ export declare class BudgetExceededError extends Error {
     readonly remaining: number;
     constructor(apiKey: string, spent: number, budget: number);
 }
+//# sourceMappingURL=budgetEnforcer.d.ts.map

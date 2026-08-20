@@ -55,3 +55,4 @@ export declare function qualityAdjustedCostScore(costScore: number, qualityScore
  */
 export declare function budgetAwareCostScore(costPer1K: number, budgetMultiplier?: number): number;
 export declare function runValidationTests(): void;
+//# sourceMappingURL=costUtils.d.ts.map

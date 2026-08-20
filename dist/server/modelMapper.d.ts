@@ -41,3 +41,4 @@ export declare function listAvailableModels(): Array<{
     created: number;
     owned_by: string;
 }>;
+//# sourceMappingURL=modelMapper.d.ts.map

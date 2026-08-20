@@ -130,8 +130,8 @@ declare const PROVIDER_INFO: {
         strength: string;
     };
 };
-declare function createInterface(): any;
-declare function question(rl: any, text: any): Promise<unknown>;
+declare function createInterface(): readline.Interface;
+declare function question(rl: readline.Interface, text: string): Promise<string>;
 declare function detectApiKeys(): Promise<{
     envVar: string;
     providerId: string;

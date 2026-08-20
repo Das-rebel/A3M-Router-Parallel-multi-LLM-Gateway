@@ -75,3 +75,4 @@ export declare class CostAnalytics {
     private getDaysCovered;
 }
 export declare function createCostAnalytics(maxRecords?: number): CostAnalytics;
+//# sourceMappingURL=costAnalytics.d.ts.map

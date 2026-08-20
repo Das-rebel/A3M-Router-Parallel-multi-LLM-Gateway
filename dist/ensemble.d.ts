@@ -11,7 +11,7 @@ interface RouteDecision {
 export type RouterDecision = RouteDecision;
 export declare const A3MRouter: any;
 export { createA3MRouter };
-export type EnsembleStrategy = 'majority' | 'weighted' | 'conservative' | 'shapley';
+export type EnsembleStrategy = 'majority' | 'weighted' | 'conservative' | 'shapley' | 'semantic';
 export interface EnsembleResponse {
     finalAnswer: string;
     confidence: number;
@@ -44,3 +44,4 @@ export declare class EnsembleOrchestrator {
 }
 export { LoyaltyMatrix, HandicapCalculator, calculateEnhancedShapley } from './ensemble/shapleyValue';
 export { dialogOptimizer, MultiRoundDialogOptimizer } from './ensemble/multiRoundDialog';
+//# sourceMappingURL=ensemble.d.ts.map

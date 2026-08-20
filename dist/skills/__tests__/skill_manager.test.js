@@ -40,6 +40,7 @@ const globals_1 = require("@jest/globals");
 const skill_manager_1 = require("../skill_manager");
 const skill_enhanced_agent_1 = require("../../agents/skill_enhanced_agent");
 const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 // Mock fs operations
 globals_1.jest.mock('fs');
 (0, globals_1.describe)('SkillManager', () => {
@@ -67,8 +68,8 @@ description: "A test skill for testing"
 ---
 # Test Skill Content`;
             globals_1.jest.spyOn(fs, 'existsSync').mockReturnValue(true);
-            globals_1.jest.spyOn(Path.prototype, 'isDirectory').mockReturnValue(true);
-            globals_1.jest.spyOn(Path.prototype, 'iterdir').mockReturnValue([
+            globals_1.jest.spyOn(path.prototype, 'isDirectory').mockReturnValue(true);
+            globals_1.jest.spyOn(path.prototype, 'iterdir').mockReturnValue([
                 { name: 'SKILL.md', isFile: () => true }
             ]);
             globals_1.jest.spyOn(fs, 'readFileSync').mockReturnValue(mockSkillMD);
@@ -76,7 +77,7 @@ description: "A test skill for testing"
             (0, globals_1.expect)(skillManager.list_skills()).toContain('Test Skill');
         });
         (0, globals_1.it)('should skip directories without SKILL.md', () => {
-            globals_1.jest.spyOn(Path.prototype, 'existsSync').mockReturnValue(false);
+            globals_1.jest.spyOn(path.prototype, 'existsSync').mockReturnValue(false);
             skillManager.reload_skills();
             (0, globals_1.expect)(skillManager.list_skills()).toEqual([]);
         });
@@ -84,9 +85,9 @@ description: "A test skill for testing"
     (0, globals_1.describe)('get_relevant_skills', () => {
         (0, globals_1.beforeEach)(() => {
             // Add mock skills
-            skillManager.skills['React Development'] = new skill_manager_1.Skill('React Development', 'Best practices for React components', Path('/mock/react'), {});
-            skillManager.skills['Node.js API'] = new skill_manager_1.Skill('Node.js API', 'Building backend APIs with Node.js and Express', Path('/mock/nodejs'), {});
-            skillManager.skills['Python Django'] = new skill_manager_1.Skill('Python Django', 'Django web framework for Python', Path('/mock/python'), {});
+            skillManager.skills['React Development'] = new skill_manager_1.Skill('React Development', 'Best practices for React components', path('/mock/react'), {});
+            skillManager.skills['Node.js API'] = new skill_manager_1.Skill('Node.js API', 'Building backend APIs with Node.js and Express', path('/mock/nodejs'), {});
+            skillManager.skills['Python Django'] = new skill_manager_1.Skill('Python Django', 'Django web framework for Python', path('/mock/python'), {});
         });
         (0, globals_1.it)('should find skills with keyword matching', () => {
             const relevant = skillManager.get_relevant_skills('Build a React component for user login', 2);

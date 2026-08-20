@@ -46,3 +46,4 @@ export declare function createA3MRouter(options?: A3MRouterOptions): {
     options: A3MRouterOptions;
 };
 export default createA3MRouter;
+//# sourceMappingURL=index.d.ts.map

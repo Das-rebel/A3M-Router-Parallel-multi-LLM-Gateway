@@ -75,3 +75,4 @@ declare const _default: {
     RESEARCH_TEMPLATES: Record<string, string>;
 };
 export default _default;
+//# sourceMappingURL=scienceAdapter.d.ts.map

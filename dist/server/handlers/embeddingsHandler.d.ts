@@ -14,3 +14,4 @@ import * as http from 'http';
 import { RouteContext } from '../router';
 export declare function handleEmbeddings(req: http.IncomingMessage, res: http.ServerResponse, ctx: RouteContext): Promise<void>;
 export default handleEmbeddings;
+//# sourceMappingURL=embeddingsHandler.d.ts.map

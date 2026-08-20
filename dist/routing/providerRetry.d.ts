@@ -113,3 +113,4 @@ export declare class ProviderRetryHandler {
 export declare function createRetryHandler(customConfigs?: ProviderRetryConfig): ProviderRetryHandler;
 export declare function getDefaultRetryHandler(): ProviderRetryHandler;
 export { DEFAULT_RETRY_CONFIG, PROVIDER_CONTEXT_LIMITS, };
+//# sourceMappingURL=providerRetry.d.ts.map

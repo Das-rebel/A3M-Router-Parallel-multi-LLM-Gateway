@@ -10,3 +10,4 @@ export declare function quickselectTopK<T>(arr: T[], k: number, compare: (a: T) 
  * Select top candidate using Quickselect
  */
 export declare function selectTop<T>(arr: T[], compare: (a: T) => number): T | undefined;
+//# sourceMappingURL=sorting.d.ts.map

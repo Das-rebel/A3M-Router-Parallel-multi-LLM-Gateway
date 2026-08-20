@@ -60,7 +60,7 @@ export declare function routeBatch(prompts: string[], options?: {
     max_cost_per_prompt?: number;
 }): RouteDecision[];
 export declare function recommendForTask(task: string): {
-    primary: string;
+    primary: string | null;
     fallbacks: string[];
     reason: string;
     features: QueryFeatures;
@@ -68,3 +68,4 @@ export declare function recommendForTask(task: string): {
 export declare function updateModelProfile(model_name: string, actual_latency_ms: number, actual_cost: number, quality_rating: number): void;
 export declare function getProviderHealth(): Promise<any>;
 export {};
+//# sourceMappingURL=advancedRouter.d.ts.map

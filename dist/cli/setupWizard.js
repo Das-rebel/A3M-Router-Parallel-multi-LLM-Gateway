@@ -78,6 +78,7 @@ async function runWizard() {
     }
     // Check for existing config
     let existingConfig = {};
+    ;
     if (fs.existsSync(CONFIG_FILE)) {
         try {
             existingConfig = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));

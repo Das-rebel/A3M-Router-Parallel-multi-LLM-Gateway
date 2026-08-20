@@ -617,30 +617,36 @@ exports.DEFAULT_PROVIDERS = {
         baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
         apiKeyEnv: 'OPENROUTER_API_KEY',
         models: [
-            // Premium-tier free models (high context, powerful) — assigned equivalent costs for routing
-            // so the router classifies them as mid/premium tier
-            'moonshotai/kimi-k2.6:free',
-            'qwen/qwen3-coder:free',
-            'nvidia/nemotron-3-ultra-550b-a55b:free',
-            'nvidia/nemotron-3-super-120b-a12b:free',
-            'google/gemma-4-31b-it:free',
-            'qwen/qwen3-next-80b-a3b-instruct:free',
-            'nousresearch/hermes-3-llama-3.1-405b:free',
-            'openai/gpt-oss-120b:free',
-            'meta-llama/llama-3.3-70b-instruct:free',
-            // Paid models (passthrough pricing — set representative costs for routing)
+            // ✅ VERIFIED WORKING FREE MODELS (tested 2026-08-16 + recheck)
+            // Premium-tier free models (high context, powerful)
+            'nvidia/nemotron-3.5-lightning:free', // 1M context, reasoning
+            'nvidia/nemotron-3-ultra-550b-a55b:free', // 1M context, premium quality
+            'nvidia/nemotron-3-super-120b-a12b:free', // 262K context
+            'google/gemma-4-31b-it:free', // 262K context, multilingual
+            'google/gemma-4-26b-a4b-it:free', // 262K context
+            // Reasoning-capable models
+            'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free', // 256K, reasoning
+            // Mid-tier free models
+            'nvidia/nemotron-3-nano-30b-a3b:free', // 256K context
+            'nvidia/nemotron-nano-9b-v2:free', // 128K context
+            'nvidia/nemotron-nano-12b-v2-vl:free', // 128K context, multimodal (was broken, now fixed)
+            // Auto-route free model
+            'openrouter/free', // Auto-selects best available free model
+            // ❌ REMOVED (unavailable): kimi-k2.6, qwen3-coder, qwen3-next, hermes-3-405b, gpt-oss-120b, llama-3.3-70b, laguna-s-2.1
+            // Paid models (passthrough pricing)
             'openai/gpt-4o',
             'anthropic/claude-3.5-sonnet',
             'google/gemini-pro-1.5',
             'meta-llama/llama-3.1-70b-instruct',
             'mistralai/mistral-large',
         ],
-        costPerK: { input: 0, output: 0 }, // Passthrough pricing — router uses model-specific costs
-        tier: 'cheap',
+        costPerK: { input: 0, output: 0 }, // Free tier models cost 0; paid use passthrough
+        tier: 'mid', // Changed from 'cheap' — premium free models are mid-tier quality
         format: 'openai',
         type: 'api',
         priority: 34,
-        maxTokens: 128000,
+        maxTokens: 1048576, // Support 1M context for nemotron-3.5-lightning
+        strategy: 'balanced',
     },
     // ========================================================================
     // CLI PROVIDERS (local tools)
@@ -693,12 +699,13 @@ exports.DEFAULT_PROVIDERS = {
             'mistralai/mistral-large-3-675b-instruct-2512',
             'z-ai/glm-5.1',
         ],
-        costPerK: { input: 0, output: 0 },
+        costPerK: { input: 0, output: 0 }, // Free tier available
         tier: 'free',
         format: 'openai',
         type: 'api',
         priority: 4,
-        maxTokens: 8192,
+        maxTokens: 131072, // Support long context for premium models
+        strategy: 'balanced',
     },
     // ========================================================================
     // CLOUDFLARE WORKERS AI (global edge network, free tier)

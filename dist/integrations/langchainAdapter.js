@@ -40,13 +40,13 @@ exports.createAutoRoutingChatModel = createAutoRoutingChatModel;
 // A3M INTERNAL IMPORTS
 // ============================================================
 const providerConfig_js_1 = require("../providers/providerConfig.js");
-const registry_js_1 = require("../providers/registry.js");
+const registry_1 = require("../providers/registry");
 // ============================================================
 // HELPER: Convert LangChain messages to OpenAI format
 // ============================================================
 function langchainMessagesToOpenAI(messages) {
     return messages.map((msg) => {
-        const role = msg._getType();
+        const role = (msg._getType());
         let content;
         if (typeof msg.content === 'string') {
             content = msg.content;
@@ -392,7 +392,7 @@ class A3MChatModel {
             this.registry = options.router;
         }
         else {
-            this.registry = new registry_js_1.ProviderRegistry();
+            this.registry = new registry_1.ProviderRegistry();
         }
     }
     // ========================================================================

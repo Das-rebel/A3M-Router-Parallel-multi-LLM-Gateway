@@ -46,3 +46,4 @@ declare const _default: {
     getRegisteredRoutes: typeof getRegisteredRoutes;
 };
 export default _default;
+//# sourceMappingURL=router.d.ts.map

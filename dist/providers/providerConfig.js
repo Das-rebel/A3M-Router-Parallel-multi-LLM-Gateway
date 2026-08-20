@@ -629,10 +629,18 @@ exports.DEFAULT_PROVIDERS = {
             // Mid-tier free models
             'nvidia/nemotron-3-nano-30b-a3b:free', // 256K context
             'nvidia/nemotron-nano-9b-v2:free', // 128K context
-            'nvidia/nemotron-nano-12b-v2-vl:free', // 128K context, multimodal (was broken, now fixed)
+            'nvidia/nemotron-nano-12b-v2-vl:free', // 128K context, multimodal
             // Auto-route free model
             'openrouter/free', // Auto-selects best available free model
             // ❌ REMOVED (unavailable): kimi-k2.6, qwen3-coder, qwen3-next, hermes-3-405b, gpt-oss-120b, llama-3.3-70b, laguna-s-2.1
+            // FREE Gemini 3.x (newer, better than 2.x)
+            'google/gemini-3.5-flash:free', // 131K context, reasoning, free
+            'google/gemini-3.6-flash:free', // 131K context, reasoning, free
+            // FREE Qwen 3.7 (latest Qwen with extended context)
+            'qwen/qwen3.7-flash:free', // 131K context, reasoning, free
+            'qwen/qwen3.7-max:free', // 131K context, reasoning, free
+            // FREE DeepSeek V4 Flash
+            'deepseek/deepseek-v4-flash-latest:free', // 131K context, reasoning, free
             // Paid models (passthrough pricing)
             'openai/gpt-4o',
             'anthropic/claude-3.5-sonnet',

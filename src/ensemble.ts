@@ -21,6 +21,126 @@ interface RouteDecision {
   reasoning: string;
 }
 
+// ============================================================
+// SEMANTIC VOTING: Cluster similar answers together
+// ============================================================
+
+/**
+ * Simple word-overlap based semantic similarity
+ * Returns 0-1 similarity score
+ */
+function wordOverlapSimilarity(a: string, b: string): number {
+  // Normalize: lowercase, remove code blocks, extract words
+  const normalize = (s: string) => {
+    return s.toLowerCase()
+      .replace(/```[\s\S]*?```/g, ' CODE ')  // Replace code blocks
+      .replace(/`[^`]*`/g, ' CODE ')          // Replace inline code
+      .replace(/[^a-z0-9\s]/g, ' ')          // Remove punctuation
+      .split(/\s+/)
+      .filter(w => w.length > 2);             // Remove stopwords
+  };
+  
+  const wordsA = normalize(a);
+  const wordsB = normalize(b);
+  
+  if (wordsA.length === 0 || wordsB.length === 0) return 0;
+  
+  // Jaccard similarity
+  const setA = new Set(wordsA);
+  const setB = new Set(wordsB);
+  let intersection = 0;
+  for (const w of setA) {
+    if (setB.has(w)) intersection++;
+  }
+  const union = setA.size + setB.size - intersection;
+  return union > 0 ? intersection / union : 0;
+}
+
+/**
+ * Cluster answers by semantic similarity using agglomerative clustering
+ * Returns clusters of (representative, [provider indices])
+ */
+function semanticCluster(
+  answers: { provider: string; answer: string }[],
+  threshold = 0.6
+): { cluster: string; providers: string[] }[] {
+  if (answers.length === 0) return [];
+  if (answers.length === 1) return [{ cluster: answers[0].answer, providers: [answers[0].provider] }];
+  
+  // Build similarity matrix
+  const n = answers.length;
+  const sims: number[][] = Array(n).fill(null).map(() => Array(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) {
+        sims[i][j] = 1.0;
+      } else if (j > i) {
+        const s = wordOverlapSimilarity(answers[i].answer, answers[j].answer);
+        sims[i][j] = s;
+        sims[j][i] = s;
+      }
+    }
+  }
+  
+  // Agglomerative clustering: greedily merge most similar pairs
+  const clusters: Set<number>[] = answers.map((_, i) => new Set([i]));
+  const active = new Set(answers.map((_, i) => i));
+  
+  while (active.size > 1) {
+    let bestSim = 0;
+    let bestI = -1, bestJ = -1;
+    
+    for (const i of active) {
+      for (const j of active) {
+        if (i >= j) continue;
+        // Average similarity between all pairs in two clusters
+        let sumSim = 0, count = 0;
+        for (const ci of clusters[i]) {
+          for (const cj of clusters[j]) {
+            sumSim += sims[ci][cj];
+            count++;
+          }
+        }
+        const avgSim = count > 0 ? sumSim / count : 0;
+        if (avgSim > bestSim) {
+          bestSim = avgSim;
+          bestI = i;
+          bestJ = j;
+        }
+      }
+    }
+    
+    if (bestSim < threshold || bestI < 0) break;
+    
+    // Merge clusters
+    for (const idx of clusters[bestJ]) {
+      clusters[bestI].add(idx);
+    }
+    active.delete(bestJ);
+  }
+  
+  // Build result
+  return clusters
+    .filter((_, i) => active.has(i))
+    .map(cluster => {
+      const indices = Array.from(cluster);
+      // Use the longest answer as cluster representative (most informative)
+      let longestIdx = indices[0];
+      let longestLen = answers[indices[0]].answer.length;
+      for (const idx of indices) {
+        if (answers[idx].answer.length > longestLen) {
+          longestLen = answers[idx].answer.length;
+          longestIdx = idx;
+        }
+      }
+      return {
+        cluster: answers[longestIdx].answer,
+        providers: indices.map(i => answers[i].provider)
+      };
+    })
+    .sort((a, b) => b.providers.length - a.providers.length);  // Largest cluster first
+}
+
 // Type alias for external consumers
 export type RouterDecision = RouteDecision;
 
@@ -29,7 +149,7 @@ export type RouterDecision = RouteDecision;
 export const A3MRouter = createA3MRouter as any;
 export { createA3MRouter };
 
-export type EnsembleStrategy = 'majority' | 'weighted' | 'conservative' | 'shapley';
+export type EnsembleStrategy = 'majority' | 'weighted' | 'conservative' | 'shapley' | 'semantic';
 
 export interface EnsembleResponse {
   finalAnswer: string;
@@ -156,6 +276,39 @@ export class EnsembleOrchestrator {
         const cost = weights[r.provider] || 0.001;
         this.handicapCalc.record(r.provider, cost, isCorrect(r.answer));
       });
+    }
+    else if (strategy === 'semantic') {
+      // === SEMANTIC VOTING: Cluster similar answers together ===
+      // This handles cases where models give equivalent answers in different words
+      // e.g., "The answer is 42" vs "42 is correct" would be clustered together
+      
+      const clusters = semanticCluster(successful, 0.55);  // 55% similarity threshold
+      
+      if (clusters.length === 0) {
+        winnerAnswer = 'UNCERTAIN';
+        confidence = 0;
+        winnerProvider = 'none';
+      } else {
+        // Use weighted voting: cluster size * average provider weight
+        const clusterScores = clusters.map(cluster => {
+          const totalWeight = cluster.providers.reduce((sum, p) => sum + (weights[p] || 1.0), 0);
+          return {
+            cluster: cluster.cluster,
+            providers: cluster.providers,
+            score: cluster.providers.length * totalWeight / cluster.providers.length
+          };
+        }).sort((a, b) => b.score - a.score);
+        
+        winnerAnswer = clusterScores[0].cluster;
+        winnerProvider = clusterScores[0].providers[0];
+        confidence = clusterScores[0].providers.length / successful.length;
+        
+        // Log cluster info for debugging
+        console.log(`[SEMANTIC] ${clusters.length} clusters formed, winner has ${clusterScores[0].providers.length}/${successful.length} providers`);
+        clusters.slice(1, 3).forEach((c, i) => {
+          console.log(`[SEMANTIC] Cluster ${i+2}: ${c.providers.length} providers, preview: ${c.cluster.substring(0, 50)}...`);
+        });
+      }
     }
 
     // Record loyalty: successful collaborations build trust

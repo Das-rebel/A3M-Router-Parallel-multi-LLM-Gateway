@@ -137,6 +137,12 @@ function buildModelProfiles(): Record<string, ModelProfile> {
           'google/gemini-pro-1.5': [1.25, 5],
           'meta-llama/llama-3.1-70b-instruct': [0.18, 0.18],
           'mistralai/mistral-large': [2, 6],
+          // Newer free models (these override the default 0,0 for free tier)
+          'gemini-3.5-flash:free': [0, 0],
+          'gemini-3.6-flash:free': [0, 0],
+          'qwen3.7-flash:free': [0, 0],
+          'qwen3.7-max:free': [0, 0],
+          'deepseek-v4-flash-latest:free': [0, 0],
         };
         const orKey = model.includes('/') ? model : 'openrouter/' + model;
         // Try matching by full key or by model name
@@ -165,18 +171,46 @@ function buildModelProfiles(): Record<string, ModelProfile> {
       // OpenRouter premium free models get quality boosts
       if (provider.name === 'OpenRouter') {
         const modelLower = modelKey.toLowerCase();
-        // Premium-tier free models (large, high-context)
-        if (modelLower.includes('kimi') || modelLower.includes('qwen3-coder') || 
+        // Premium-tier free models (large, high-context) — these are equivalent to paid mid-tier
+        if (modelLower.includes('kimi-k2') || modelLower.includes('qwen3-coder') || 
             modelLower.includes('nemotron-3-ultra') || modelLower.includes('nemotron-3-super') ||
-            modelLower.includes('hermes-3') || modelLower.includes('gemma-4')) {
+            modelLower.includes('nemotron-3.5-lightning') || modelLower.includes('nemotron-3-nano-omni') ||
+            modelLower.includes('hermes-3') || modelLower.includes('gemma-4-31b') ||
+            modelLower.includes('laguna-s-2.1') ||
+            // Gemini 3.x free models — latest reasoning models
+            modelLower.includes('gemini-3.5-flash') || modelLower.includes('gemini-3.6-flash') ||
+            // Qwen 3.7 free models — latest with extended context
+            modelLower.includes('qwen3.7-flash') || modelLower.includes('qwen3.7-max') ||
+            // DeepSeek V4 free
+            modelLower.includes('deepseek-v4-flash')) {
           strengths.push('reasoning', 'long-context', 'premium');
         }
-        // Mid-tier free models (good quality, smaller)
+        // Mid-tier free models (good quality, smaller) — equivalent to cheap tier
         else if (modelLower.includes('gpt-oss') || modelLower.includes('qwen3-next') ||
-                 modelLower.includes('gemma-4') || modelLower.includes('llama-3.3')) {
+                 modelLower.includes('gemma-4-26b') || modelLower.includes('llama-3.3-70b') ||
+                 modelLower.includes('nemotron-3-nano-30b') || modelLower.includes('nemotron-nano-9b')) {
           strengths.push('fast', 'reasoning');
         }
-        // Budget free models
+        // Budget free models (small models)
+        else {
+          strengths.push('fast');
+        }
+      }
+      // NVIDIA NIM premium free models (high quality, long context)
+      if (provider.name === 'NVIDIA NIM') {
+        const modelLower = modelKey.toLowerCase();
+        // Premium tier: nemotron-super, gemma-4-31b, llama-3.3-70b
+        if (modelLower.includes('nemotron-3-super') || modelLower.includes('gemma-4-31b') ||
+            modelLower.includes('llama-3.3-70b') || modelLower.includes('mistral-large') ||
+            modelLower.includes('glm-5')) {
+          strengths.push('reasoning', 'long-context', 'premium');
+        }
+        // Mid tier: nemotron-mini, llama-3.1-8b, qwen
+        else if (modelLower.includes('nemotron-mini') || modelLower.includes('llama-3.1') ||
+                 modelLower.includes('qwen')) {
+          strengths.push('fast', 'reasoning');
+        }
+        // Budget tier
         else {
           strengths.push('fast');
         }
@@ -200,6 +234,10 @@ function buildModelProfiles(): Record<string, ModelProfile> {
       if (provider.name === 'Anthropic') {
         strengths.push('reasoning', 'creative', 'analysis');
       }
+      // Cloudflare Workers AI models (free but limited)
+      if (provider.name === 'Cloudflare Workers AI') {
+        strengths.push('free', 'fast');
+      }
 
       // Detect multimodal support
       const supportsMultimodal = provider.supports_multimodal === true;
@@ -209,6 +247,30 @@ function buildModelProfiles(): Record<string, ModelProfile> {
         strengths.push(provider.strategy);
       }
       
+      // === QUALITY SCORE ASSIGNMENT ===
+      // Priority: premium/reasoning > fast+paid > fast/free > budget > default
+      // Free models with premium/reasoning tags get same quality as paid models
+      let quality_score: number;
+      if (strengths.includes('premium') || strengths.includes('reasoning')) {
+        // Premium models (including premium free models like nemotron-3-super:free)
+        // get high quality score — same as paid premium models
+        quality_score = 0.92;
+      } else if (strengths.includes('fast') && costPerKInput > 0.3) {
+        // Fast mid-tier models (Groq, Cerebras, etc.) get competitive quality
+        quality_score = 0.89;
+      } else if (strengths.includes('fast') && costPerKInput === 0) {
+        // Fast free models (Cloudflare, local models) get moderate quality
+        quality_score = 0.78;
+      } else if (strengths.includes('budget')) {
+        // Budget models (small, cheap)
+        quality_score = 0.75;
+      } else if (provider.name === 'OpenRouter' && costPerKInput === 0) {
+        // OpenRouter free models that don't match premium patterns get boosted
+        quality_score = 0.82;
+      } else {
+        quality_score = 0.80;
+      }
+      
       profiles[modelKey] = {
         name: modelKey,
         provider: providerId,
@@ -216,9 +278,7 @@ function buildModelProfiles(): Record<string, ModelProfile> {
         cost_per_1k_input: costPerKInput,
         cost_per_1k_output: costPerKOutput,
         latency_ms: provider.type === 'cli' ? 5000 : (provider.priority * 200 + 300),
-        quality_score: (strengths.includes('premium') || strengths.includes('reasoning')) ? 0.94 :
-                       (strengths.includes('fast') && costPerKInput > 0.3) ? 0.95 :  // Boosted for mid-tier competitiveness
-                       (strengths.includes('budget') || strengths.includes('free')) ? 0.72 : 0.80,
+        quality_score,
         strengths,
         context_window: provider.maxTokens || 8192,
         type: provider.type,
@@ -609,7 +669,13 @@ function scoreModelFit(model: ModelProfile, features: QueryFeatures): number {
   // If user has free + groq + openai → quartiles split them naturally.
   const modelCost = (model.cost_per_1k_input + model.cost_per_1k_output) / 2;
   let tierFromModel: string;
-  if (model.strengths.includes('free') || modelCost === 0) {
+  // Premium free models (with 'premium' or 'reasoning' tag) are treated as 'mid' tier
+  // They should be selected for quality, not penalized for being "free"
+  const isPremiumFree = model.strengths.includes('free') && 
+    (model.strengths.includes('premium') || model.strengths.includes('reasoning'));
+  if (isPremiumFree) {
+    tierFromModel = 'mid';  // Treat premium free models as mid-tier for scoring
+  } else if (model.strengths.includes('free') || modelCost === 0) {
     tierFromModel = 'free';
   } else if (modelCost <= _costPercentiles.p25) {
     tierFromModel = 'cheap';
@@ -662,8 +728,21 @@ function scoreModelFit(model: ModelProfile, features: QueryFeatures): number {
     };
     const bonuses = domainBonus[features.domain] || [];
     if (bonuses.some(b => model.strengths.includes(b))) {
-      const is_budget = model.strengths.includes('budget') || model.strengths.includes('free');
-      score += is_budget ? 0.05 : 0.25;  // Budget gets minimal boost
+      // Separate budget from premium free models
+      const isBudget = model.strengths.includes('budget');
+      const isPremiumFree = model.strengths.includes('free') && 
+        (model.strengths.includes('premium') || model.strengths.includes('reasoning'));
+      const isBudgetFree = model.strengths.includes('free') && !isPremiumFree;
+      
+      if (isBudget) {
+        score += 0.05;  // Budget models get minimal domain boost
+      } else if (isPremiumFree) {
+        score += 0.15;  // Premium free models get significant boost (quality match)
+      } else if (isBudgetFree) {
+        score += 0.05;  // Budget free models get minimal boost
+      } else {
+        score += 0.25;  // Paid premium models get full boost
+      }
     }
   }
 
@@ -706,9 +785,15 @@ function scoreModelFit(model: ModelProfile, features: QueryFeatures): number {
     score *= 0.8;   // Mild penalty for conservative providers on low-risk (cost waste)
   }
 
-  // Free tier preference for simple queries
+  // Free tier preference for simple queries — ONLY for truly budget free models
+  // Premium free models (nemotron-super, gemma-4-31b, etc.) should be selected on quality,
+  // not because they're free, so they don't get this bonus
   if (features.complexity < 0.5 && model.strengths.includes('free')) {
-    score += 0.2;
+    const isBudgetFree = !model.strengths.includes('premium') && !model.strengths.includes('reasoning');
+    if (isBudgetFree) {
+      score += 0.05;  // Small bonus only — prevent budget free models from hitting cap
+    }
+    // Premium free models: NO bonus — they're selected on quality merits
   }
 
   // Fast provider for simple queries

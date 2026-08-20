@@ -1,15 +1,25 @@
-"""A3M Router MCP Server — Model Context Protocol server for A3M Router.
-
-Usage:
-    python -m a3m_mcp          # Start the MCP server
-    pip install a3m-mcp-server  # Install as package
 """
-try:
-    from .server import main, HAS_MCP, SERVER_NAME
-except ImportError:
-    main = None
-    HAS_MCP = False
-    SERVER_NAME = "a3m-router"
+A3M Router MCP Server
+
+MCP (Model Context Protocol) server for A3M Router.
+Provides intelligent LLM routing and ensemble execution as MCP tools.
+"""
 
 __version__ = "1.0.0"
-__all__ = ["main", "HAS_MCP", "SERVER_NAME", "__version__"]
+
+# Try to import MCP components
+HAS_MCP = False
+SERVER_NAME = "a3m-router"
+
+try:
+    from mcp.server.lowlevel import Server
+    from mcp import Tool
+    HAS_MCP = True
+except ImportError:
+    pass
+
+# Import main if available
+try:
+    from .server import main
+except ImportError:
+    main = None

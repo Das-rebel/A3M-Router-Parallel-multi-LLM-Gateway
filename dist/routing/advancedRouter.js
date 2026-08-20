@@ -108,6 +108,12 @@ function buildModelProfiles() {
                     'google/gemini-pro-1.5': [1.25, 5],
                     'meta-llama/llama-3.1-70b-instruct': [0.18, 0.18],
                     'mistralai/mistral-large': [2, 6],
+                    // Newer free models (these override the default 0,0 for free tier)
+                    'gemini-3.5-flash:free': [0, 0],
+                    'gemini-3.6-flash:free': [0, 0],
+                    'qwen3.7-flash:free': [0, 0],
+                    'qwen3.7-max:free': [0, 0],
+                    'deepseek-v4-flash-latest:free': [0, 0],
                 };
                 const orKey = model.includes('/') ? model : 'openrouter/' + model;
                 // Try matching by full key or by model name
@@ -141,7 +147,13 @@ function buildModelProfiles() {
                     modelLower.includes('nemotron-3-ultra') || modelLower.includes('nemotron-3-super') ||
                     modelLower.includes('nemotron-3.5-lightning') || modelLower.includes('nemotron-3-nano-omni') ||
                     modelLower.includes('hermes-3') || modelLower.includes('gemma-4-31b') ||
-                    modelLower.includes('laguna-s-2.1')) {
+                    modelLower.includes('laguna-s-2.1') ||
+                    // Gemini 3.x free models — latest reasoning models
+                    modelLower.includes('gemini-3.5-flash') || modelLower.includes('gemini-3.6-flash') ||
+                    // Qwen 3.7 free models — latest with extended context
+                    modelLower.includes('qwen3.7-flash') || modelLower.includes('qwen3.7-max') ||
+                    // DeepSeek V4 free
+                    modelLower.includes('deepseek-v4-flash')) {
                     strengths.push('reasoning', 'long-context', 'premium');
                 }
                 // Mid-tier free models (good quality, smaller) — equivalent to cheap tier

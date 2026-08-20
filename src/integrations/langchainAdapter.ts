@@ -74,7 +74,7 @@ import {
   registerProvider,
 } from '../providers/providerConfig.js';
 
-import { ProviderRegistry } from '../providers/registry.js';
+import { ProviderRegistry } from '../providers/registry';
 
 // ============================================================
 // TYPES
@@ -136,7 +136,7 @@ function langchainMessagesToOpenAI(messages: BaseMessage[]): Array<{
   tool_calls?: A3MToolCall[];
 }> {
   return messages.map((msg) => {
-    const role = msg._getType() as 'system' | 'user' | 'assistant' | 'tool';
+    const role = ((msg as any)._getType()) as 'system' | 'user' | 'assistant' | 'tool';
 
     let content: string | Array<{ type: string; text?: string; image_url?: any }>;
     if (typeof msg.content === 'string') {

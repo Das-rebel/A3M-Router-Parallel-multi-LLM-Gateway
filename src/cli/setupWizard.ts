@@ -52,16 +52,16 @@ const PROVIDER_INFO = {
   baichuan: { name: 'Baichuan', models: 'baichuan-4', tier: 'cheap', strength: 'Chinese, balanced' },
 };
 
-function createInterface() {
+function createInterface(): readline.Interface {
   return readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
 }
 
-function question(rl, text) {
+function question(rl: readline.Interface, text: string): Promise<string> {
   return new Promise((resolve) => {
-    rl.question(text, (answer) => resolve(answer));
+    rl.question(text, (answer: string) => resolve(answer));
   });
 }
 
@@ -87,7 +87,7 @@ async function runWizard() {
   }
   
   // Check for existing config
-  let existingConfig = {};
+  let existingConfig: any = {};;
   if (fs.existsSync(CONFIG_FILE)) {
     try {
       existingConfig = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
@@ -114,7 +114,7 @@ async function runWizard() {
   
   // Provider selection
   const allProviders = Object.keys(PROVIDER_INFO);
-  const selected = new Set();
+  const selected: Set<string> = new Set();
   
   // Pre-select providers with detected keys
   detected.forEach(({ providerId }) => selected.add(providerId));
@@ -148,13 +148,13 @@ async function runWizard() {
   console.log('\n✓ Selected providers:', Array.from(selected).join(', '));
   
   // Build config
-  const config = {
+  const config: { version: string; providers: Record<string, { name: string; apiKey: string; models: string[]; type: string; enabled: boolean }> } = {
     version: '1.0',
     providers: {}
   };
   
   selected.forEach(providerId => {
-    const info = PROVIDER_INFO[providerId];
+    const info = PROVIDER_INFO[providerId as keyof typeof PROVIDER_INFO];
     const envKey = Object.entries(API_KEY_ENV_MAP).find(([k, v]) => v === providerId)?.[0];
     
     config.providers[providerId] = {

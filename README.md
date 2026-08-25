@@ -304,3 +304,9 @@ We're not competing — we're offering a different philosophy.
   <a href="https://www.npmjs.com/package/adaptive-memory-multi-model-router">npm</a> •
   <a href="https://pypi.org/project/a3m-router/">PyPI</a>
 </p>
+
+---
+
+## 🔧 More from Das-rebel
+
+- **[FinWipe](https://github.com/Das-rebel/finwipe)** — DIY financial data deletion CLI for India. Exercise your right to erasure under the DPDP Act 2023 across 230+ NBFCs, fintechs and banks.

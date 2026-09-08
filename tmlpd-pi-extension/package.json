@@ -1,6 +1,6 @@
 {
   "name": "tmlpd-pi",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "version_description": "v1.3.2 - Discoverability release: value-prop description, reallocated keywords, README rewrite with demo. Run N LLMs in parallel, keep the best answer.",
   "description": "Run N LLMs in parallel, keep the best answer. Confidence-scored ensemble merging beats sequential fallback on latency and quality. 40-60% token savings built in.",
   "main": "dist/index.js",

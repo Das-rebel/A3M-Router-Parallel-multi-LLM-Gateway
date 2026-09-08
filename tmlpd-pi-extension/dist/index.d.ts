@@ -37,6 +37,8 @@ import { BatchProcessor, executeBatch, BatchItem, BatchResult, BatchOptions, Bat
 import { routeQuery, routeBatch, recommendForTask, extractQueryFeatures, updateModelProfile, MODEL_PROFILES, QueryFeatures, ModelProfile, RouteDecision } from "./routing/advancedRouter";
 import { PrefixCache, createWarmedCache, PrefixCacheStats } from "./cache/prefixCache";
 import { SpeculativeDecoder, speculativeBatch, estimateSpeedupPotential, MedusaPredictor, EagleSpeculative, SpeculativeConfig, SpeculativeResult } from "./utils/speculativeDecoding";
+import { executeEnsemble, mergeComplementary, recordFeedback, EnsembleResult, EnsembleConfig } from "./routing/ensembleVoting";
+import { createPresetRouter, getPresetForQuery, DEFAULT_PRESETS, QueryPreset, PresetRouter } from "./routing/queryTypePresets";
 export { createTMLPD, TMLPDTools, TMLPDConfig, ExecuteResult, ParallelResult, StreamingConfig };
 export { ResponseCache, CacheConfig, CacheEntry };
 export { CostTracker, BudgetConfig, CostAlert, CostSummary, CostSnapshot };
@@ -50,6 +52,8 @@ export { isonEncode, isonDecode, compressText, truncateMessages, truncateToToken
 export { LocalProvider, LocalProviderManager, createOllamaProvider, createVLLMProvider, createLMStudioProvider, LocalRuntime, LocalProviderConfig, LocalModelInfo, LocalGenerationResult, LocalParallelResult };
 export { BatchProcessor, executeBatch, BatchItem, BatchResult, BatchOptions, BatchProgress, ProgressCallback };
 export { routeQuery, routeBatch, recommendForTask, extractQueryFeatures, updateModelProfile, MODEL_PROFILES, QueryFeatures, ModelProfile as ModelProfileType, RouteDecision };
+export { executeEnsemble, mergeComplementary, recordFeedback, EnsembleResult, EnsembleConfig };
+export { createPresetRouter, getPresetForQuery, DEFAULT_PRESETS, QueryPreset, PresetRouter };
 export { PrefixCache, createWarmedCache, PrefixCacheStats };
 export { SpeculativeDecoder, speculativeBatch, estimateSpeedupPotential, MedusaPredictor, EagleSpeculative, SpeculativeConfig, SpeculativeResult };
 export declare const TMLPD_PI_TOOLS: ({
@@ -80,10 +84,9 @@ export declare const TMLPD_PI_TOOLS: ({
                     };
                 };
             };
-            model?: undefined;
-            task_description?: undefined;
             max_concurrent?: undefined;
             enable_mcts?: undefined;
+            task_description?: undefined;
             limit?: undefined;
             text?: undefined;
             messages?: undefined;
@@ -92,6 +95,7 @@ export declare const TMLPD_PI_TOOLS: ({
             runtime?: undefined;
             prompts?: undefined;
             concurrency?: undefined;
+            model?: undefined;
         };
         required: string[];
     };
@@ -101,6 +105,8 @@ export declare const TMLPD_PI_TOOLS: ({
     inputSchema: {
         type: string;
         properties: {
+            models?: undefined;
+            streaming?: undefined;
             prompt: {
                 type: string;
                 description: string;
@@ -109,11 +115,9 @@ export declare const TMLPD_PI_TOOLS: ({
                 type: string;
                 description: string;
             };
-            models?: undefined;
-            streaming?: undefined;
-            task_description?: undefined;
             max_concurrent?: undefined;
             enable_mcts?: undefined;
+            task_description?: undefined;
             limit?: undefined;
             text?: undefined;
             messages?: undefined;
@@ -131,21 +135,21 @@ export declare const TMLPD_PI_TOOLS: ({
     inputSchema: {
         type: string;
         properties: {
-            prompt?: undefined;
             models?: undefined;
             streaming?: undefined;
-            model?: undefined;
-            task_description?: undefined;
             max_concurrent?: undefined;
             enable_mcts?: undefined;
+            task_description?: undefined;
             limit?: undefined;
             text?: undefined;
             messages?: undefined;
             strategy?: undefined;
             max_tokens?: undefined;
+            prompt?: undefined;
             runtime?: undefined;
             prompts?: undefined;
             concurrency?: undefined;
+            model?: undefined;
         };
         required?: undefined;
     };
@@ -155,21 +159,21 @@ export declare const TMLPD_PI_TOOLS: ({
     inputSchema: {
         type: string;
         properties: {
+            models?: undefined;
+            streaming?: undefined;
             model: {
                 type: string;
                 description: string;
             };
-            prompt?: undefined;
-            models?: undefined;
-            streaming?: undefined;
-            task_description?: undefined;
             max_concurrent?: undefined;
             enable_mcts?: undefined;
+            task_description?: undefined;
             limit?: undefined;
             text?: undefined;
             messages?: undefined;
             strategy?: undefined;
             max_tokens?: undefined;
+            prompt?: undefined;
             runtime?: undefined;
             prompts?: undefined;
             concurrency?: undefined;
@@ -182,6 +186,8 @@ export declare const TMLPD_PI_TOOLS: ({
     inputSchema: {
         type: string;
         properties: {
+            models?: undefined;
+            streaming?: undefined;
             task_description: {
                 type: string;
                 description: string;
@@ -194,18 +200,16 @@ export declare const TMLPD_PI_TOOLS: ({
                 type: string;
                 description: string;
             };
-            prompt?: undefined;
-            models?: undefined;
-            streaming?: undefined;
-            model?: undefined;
             limit?: undefined;
             text?: undefined;
             messages?: undefined;
             strategy?: undefined;
             max_tokens?: undefined;
+            prompt?: undefined;
             runtime?: undefined;
             prompts?: undefined;
             concurrency?: undefined;
+            model?: undefined;
         };
         required: string[];
     };
@@ -215,6 +219,10 @@ export declare const TMLPD_PI_TOOLS: ({
     inputSchema: {
         type: string;
         properties: {
+            models?: undefined;
+            streaming?: undefined;
+            max_concurrent?: undefined;
+            enable_mcts?: undefined;
             task_description: {
                 type: string;
                 description: string;
@@ -223,19 +231,15 @@ export declare const TMLPD_PI_TOOLS: ({
                 type: string;
                 description: string;
             };
-            prompt?: undefined;
-            models?: undefined;
-            streaming?: undefined;
-            model?: undefined;
-            max_concurrent?: undefined;
-            enable_mcts?: undefined;
             text?: undefined;
             messages?: undefined;
             strategy?: undefined;
             max_tokens?: undefined;
+            prompt?: undefined;
             runtime?: undefined;
             prompts?: undefined;
             concurrency?: undefined;
+            model?: undefined;
         };
         required: string[];
     };
@@ -245,6 +249,12 @@ export declare const TMLPD_PI_TOOLS: ({
     inputSchema: {
         type: string;
         properties: {
+            models?: undefined;
+            streaming?: undefined;
+            max_concurrent?: undefined;
+            enable_mcts?: undefined;
+            task_description?: undefined;
+            limit?: undefined;
             text: {
                 type: string;
                 description: string;
@@ -253,16 +263,10 @@ export declare const TMLPD_PI_TOOLS: ({
                 type: string;
                 description: string;
             };
-            prompt?: undefined;
-            models?: undefined;
-            streaming?: undefined;
-            task_description?: undefined;
-            max_concurrent?: undefined;
-            enable_mcts?: undefined;
-            limit?: undefined;
             messages?: undefined;
             strategy?: undefined;
             max_tokens?: undefined;
+            prompt?: undefined;
             runtime?: undefined;
             prompts?: undefined;
             concurrency?: undefined;
@@ -275,6 +279,13 @@ export declare const TMLPD_PI_TOOLS: ({
     inputSchema: {
         type: string;
         properties: {
+            models?: undefined;
+            streaming?: undefined;
+            max_concurrent?: undefined;
+            enable_mcts?: undefined;
+            task_description?: undefined;
+            limit?: undefined;
+            text?: undefined;
             messages: {
                 type: string;
                 description: string;
@@ -292,17 +303,10 @@ export declare const TMLPD_PI_TOOLS: ({
                 description: string;
             };
             prompt?: undefined;
-            models?: undefined;
-            streaming?: undefined;
-            model?: undefined;
-            task_description?: undefined;
-            max_concurrent?: undefined;
-            enable_mcts?: undefined;
-            limit?: undefined;
-            text?: undefined;
             runtime?: undefined;
             prompts?: undefined;
             concurrency?: undefined;
+            model?: undefined;
         };
         required: string[];
     };
@@ -312,6 +316,16 @@ export declare const TMLPD_PI_TOOLS: ({
     inputSchema: {
         type: string;
         properties: {
+            models?: undefined;
+            streaming?: undefined;
+            max_concurrent?: undefined;
+            enable_mcts?: undefined;
+            task_description?: undefined;
+            limit?: undefined;
+            text?: undefined;
+            messages?: undefined;
+            strategy?: undefined;
+            max_tokens?: undefined;
             prompt: {
                 type: string;
                 description: string;
@@ -325,16 +339,6 @@ export declare const TMLPD_PI_TOOLS: ({
                 type: string;
                 description: string;
             };
-            models?: undefined;
-            streaming?: undefined;
-            task_description?: undefined;
-            max_concurrent?: undefined;
-            enable_mcts?: undefined;
-            limit?: undefined;
-            text?: undefined;
-            messages?: undefined;
-            strategy?: undefined;
-            max_tokens?: undefined;
             prompts?: undefined;
             concurrency?: undefined;
         };
@@ -346,6 +350,18 @@ export declare const TMLPD_PI_TOOLS: ({
     inputSchema: {
         type: string;
         properties: {
+            models?: undefined;
+            streaming?: undefined;
+            max_concurrent?: undefined;
+            enable_mcts?: undefined;
+            task_description?: undefined;
+            limit?: undefined;
+            text?: undefined;
+            messages?: undefined;
+            strategy?: undefined;
+            max_tokens?: undefined;
+            prompt?: undefined;
+            runtime?: undefined;
             prompts: {
                 type: string;
                 items: {
@@ -361,18 +377,6 @@ export declare const TMLPD_PI_TOOLS: ({
                 type: string;
                 description: string;
             };
-            prompt?: undefined;
-            models?: undefined;
-            streaming?: undefined;
-            task_description?: undefined;
-            max_concurrent?: undefined;
-            enable_mcts?: undefined;
-            limit?: undefined;
-            text?: undefined;
-            messages?: undefined;
-            strategy?: undefined;
-            max_tokens?: undefined;
-            runtime?: undefined;
         };
         required: string[];
     };
@@ -421,10 +425,9 @@ declare const _default: {
                         };
                     };
                 };
-                model?: undefined;
-                task_description?: undefined;
                 max_concurrent?: undefined;
                 enable_mcts?: undefined;
+                task_description?: undefined;
                 limit?: undefined;
                 text?: undefined;
                 messages?: undefined;
@@ -433,6 +436,7 @@ declare const _default: {
                 runtime?: undefined;
                 prompts?: undefined;
                 concurrency?: undefined;
+                model?: undefined;
             };
             required: string[];
         };
@@ -442,6 +446,8 @@ declare const _default: {
         inputSchema: {
             type: string;
             properties: {
+                models?: undefined;
+                streaming?: undefined;
                 prompt: {
                     type: string;
                     description: string;
@@ -450,11 +456,9 @@ declare const _default: {
                     type: string;
                     description: string;
                 };
-                models?: undefined;
-                streaming?: undefined;
-                task_description?: undefined;
                 max_concurrent?: undefined;
                 enable_mcts?: undefined;
+                task_description?: undefined;
                 limit?: undefined;
                 text?: undefined;
                 messages?: undefined;
@@ -472,21 +476,21 @@ declare const _default: {
         inputSchema: {
             type: string;
             properties: {
-                prompt?: undefined;
                 models?: undefined;
                 streaming?: undefined;
-                model?: undefined;
-                task_description?: undefined;
                 max_concurrent?: undefined;
                 enable_mcts?: undefined;
+                task_description?: undefined;
                 limit?: undefined;
                 text?: undefined;
                 messages?: undefined;
                 strategy?: undefined;
                 max_tokens?: undefined;
+                prompt?: undefined;
                 runtime?: undefined;
                 prompts?: undefined;
                 concurrency?: undefined;
+                model?: undefined;
             };
             required?: undefined;
         };
@@ -496,21 +500,21 @@ declare const _default: {
         inputSchema: {
             type: string;
             properties: {
+                models?: undefined;
+                streaming?: undefined;
                 model: {
                     type: string;
                     description: string;
                 };
-                prompt?: undefined;
-                models?: undefined;
-                streaming?: undefined;
-                task_description?: undefined;
                 max_concurrent?: undefined;
                 enable_mcts?: undefined;
+                task_description?: undefined;
                 limit?: undefined;
                 text?: undefined;
                 messages?: undefined;
                 strategy?: undefined;
                 max_tokens?: undefined;
+                prompt?: undefined;
                 runtime?: undefined;
                 prompts?: undefined;
                 concurrency?: undefined;
@@ -523,6 +527,8 @@ declare const _default: {
         inputSchema: {
             type: string;
             properties: {
+                models?: undefined;
+                streaming?: undefined;
                 task_description: {
                     type: string;
                     description: string;
@@ -535,18 +541,16 @@ declare const _default: {
                     type: string;
                     description: string;
                 };
-                prompt?: undefined;
-                models?: undefined;
-                streaming?: undefined;
-                model?: undefined;
                 limit?: undefined;
                 text?: undefined;
                 messages?: undefined;
                 strategy?: undefined;
                 max_tokens?: undefined;
+                prompt?: undefined;
                 runtime?: undefined;
                 prompts?: undefined;
                 concurrency?: undefined;
+                model?: undefined;
             };
             required: string[];
         };
@@ -556,6 +560,10 @@ declare const _default: {
         inputSchema: {
             type: string;
             properties: {
+                models?: undefined;
+                streaming?: undefined;
+                max_concurrent?: undefined;
+                enable_mcts?: undefined;
                 task_description: {
                     type: string;
                     description: string;
@@ -564,19 +572,15 @@ declare const _default: {
                     type: string;
                     description: string;
                 };
-                prompt?: undefined;
-                models?: undefined;
-                streaming?: undefined;
-                model?: undefined;
-                max_concurrent?: undefined;
-                enable_mcts?: undefined;
                 text?: undefined;
                 messages?: undefined;
                 strategy?: undefined;
                 max_tokens?: undefined;
+                prompt?: undefined;
                 runtime?: undefined;
                 prompts?: undefined;
                 concurrency?: undefined;
+                model?: undefined;
             };
             required: string[];
         };
@@ -586,6 +590,12 @@ declare const _default: {
         inputSchema: {
             type: string;
             properties: {
+                models?: undefined;
+                streaming?: undefined;
+                max_concurrent?: undefined;
+                enable_mcts?: undefined;
+                task_description?: undefined;
+                limit?: undefined;
                 text: {
                     type: string;
                     description: string;
@@ -594,16 +604,10 @@ declare const _default: {
                     type: string;
                     description: string;
                 };
-                prompt?: undefined;
-                models?: undefined;
-                streaming?: undefined;
-                task_description?: undefined;
-                max_concurrent?: undefined;
-                enable_mcts?: undefined;
-                limit?: undefined;
                 messages?: undefined;
                 strategy?: undefined;
                 max_tokens?: undefined;
+                prompt?: undefined;
                 runtime?: undefined;
                 prompts?: undefined;
                 concurrency?: undefined;
@@ -616,6 +620,13 @@ declare const _default: {
         inputSchema: {
             type: string;
             properties: {
+                models?: undefined;
+                streaming?: undefined;
+                max_concurrent?: undefined;
+                enable_mcts?: undefined;
+                task_description?: undefined;
+                limit?: undefined;
+                text?: undefined;
                 messages: {
                     type: string;
                     description: string;
@@ -633,17 +644,10 @@ declare const _default: {
                     description: string;
                 };
                 prompt?: undefined;
-                models?: undefined;
-                streaming?: undefined;
-                model?: undefined;
-                task_description?: undefined;
-                max_concurrent?: undefined;
-                enable_mcts?: undefined;
-                limit?: undefined;
-                text?: undefined;
                 runtime?: undefined;
                 prompts?: undefined;
                 concurrency?: undefined;
+                model?: undefined;
             };
             required: string[];
         };
@@ -653,6 +657,16 @@ declare const _default: {
         inputSchema: {
             type: string;
             properties: {
+                models?: undefined;
+                streaming?: undefined;
+                max_concurrent?: undefined;
+                enable_mcts?: undefined;
+                task_description?: undefined;
+                limit?: undefined;
+                text?: undefined;
+                messages?: undefined;
+                strategy?: undefined;
+                max_tokens?: undefined;
                 prompt: {
                     type: string;
                     description: string;
@@ -666,16 +680,6 @@ declare const _default: {
                     type: string;
                     description: string;
                 };
-                models?: undefined;
-                streaming?: undefined;
-                task_description?: undefined;
-                max_concurrent?: undefined;
-                enable_mcts?: undefined;
-                limit?: undefined;
-                text?: undefined;
-                messages?: undefined;
-                strategy?: undefined;
-                max_tokens?: undefined;
                 prompts?: undefined;
                 concurrency?: undefined;
             };
@@ -687,6 +691,18 @@ declare const _default: {
         inputSchema: {
             type: string;
             properties: {
+                models?: undefined;
+                streaming?: undefined;
+                max_concurrent?: undefined;
+                enable_mcts?: undefined;
+                task_description?: undefined;
+                limit?: undefined;
+                text?: undefined;
+                messages?: undefined;
+                strategy?: undefined;
+                max_tokens?: undefined;
+                prompt?: undefined;
+                runtime?: undefined;
                 prompts: {
                     type: string;
                     items: {
@@ -702,18 +718,6 @@ declare const _default: {
                     type: string;
                     description: string;
                 };
-                prompt?: undefined;
-                models?: undefined;
-                streaming?: undefined;
-                task_description?: undefined;
-                max_concurrent?: undefined;
-                enable_mcts?: undefined;
-                limit?: undefined;
-                text?: undefined;
-                messages?: undefined;
-                strategy?: undefined;
-                max_tokens?: undefined;
-                runtime?: undefined;
             };
             required: string[];
         };

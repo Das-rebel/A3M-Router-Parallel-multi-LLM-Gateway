@@ -24,7 +24,8 @@
  * ```
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TMLPD_PI_TOOLS = exports.EagleSpeculative = exports.MedusaPredictor = exports.estimateSpeedupPotential = exports.speculativeBatch = exports.SpeculativeDecoder = exports.createWarmedCache = exports.PrefixCache = exports.MODEL_PROFILES = exports.updateModelProfile = exports.extractQueryFeatures = exports.recommendForTask = exports.routeBatch = exports.routeQuery = exports.executeBatch = exports.BatchProcessor = exports.createLMStudioProvider = exports.createVLLMProvider = exports.createOllamaProvider = exports.LocalProviderManager = exports.LocalProvider = exports.calculateCompressionRatio = exports.truncateToTokenBudget = exports.truncateMessages = exports.compressText = exports.isonDecode = exports.isonEncode = exports.MODEL_COSTS = exports.findCheapestModels = exports.listModelsByCost = exports.getModelCost = exports.estimateCostFromText = exports.estimateCost = exports.countTokens = exports.HALOOrchestrator = exports.MCTSWorkflowOptimizer = exports.EpisodicMemoryStore = exports.DEFAULT_RETRY_CONFIG = exports.isRetryableStatus = exports.calculateRetryDelay = exports.withRetry = exports.CircuitBreaker = exports.ProviderRegistry = exports.CostTracker = exports.ResponseCache = exports.TMLPDTools = exports.createTMLPD = void 0;
+exports.createWarmedCache = exports.PrefixCache = exports.DEFAULT_PRESETS = exports.getPresetForQuery = exports.createPresetRouter = exports.recordFeedback = exports.mergeComplementary = exports.executeEnsemble = exports.RouteDecision = exports.ModelProfileType = exports.QueryFeatures = exports.MODEL_PROFILES = exports.updateModelProfile = exports.extractQueryFeatures = exports.recommendForTask = exports.routeBatch = exports.routeQuery = exports.executeBatch = exports.BatchProcessor = exports.createLMStudioProvider = exports.createVLLMProvider = exports.createOllamaProvider = exports.LocalProviderManager = exports.LocalProvider = exports.calculateCompressionRatio = exports.truncateToTokenBudget = exports.truncateMessages = exports.compressText = exports.isonDecode = exports.isonEncode = exports.MODEL_COSTS = exports.findCheapestModels = exports.listModelsByCost = exports.getModelCost = exports.estimateCostFromText = exports.estimateCost = exports.countTokens = exports.HALOOrchestrator = exports.MCTSWorkflowOptimizer = exports.EpisodicMemoryStore = exports.DEFAULT_RETRY_CONFIG = exports.isRetryableStatus = exports.calculateRetryDelay = exports.withRetry = exports.CircuitBreaker = exports.ProviderRegistry = exports.CostTracker = exports.ResponseCache = exports.TMLPDTools = exports.createTMLPD = void 0;
+exports.TMLPD_PI_TOOLS = exports.SpeculativeResult = exports.SpeculativeConfig = exports.EagleSpeculative = exports.MedusaPredictor = exports.estimateSpeedupPotential = exports.speculativeBatch = exports.SpeculativeDecoder = exports.PrefixCacheStats = void 0;
 const tmlpdTools_1 = require("./tools/tmlpdTools");
 Object.defineProperty(exports, "createTMLPD", { enumerable: true, get: function () { return tmlpdTools_1.createTMLPD; } });
 Object.defineProperty(exports, "TMLPDTools", { enumerable: true, get: function () { return tmlpdTools_1.TMLPDTools; } });
@@ -77,15 +78,29 @@ Object.defineProperty(exports, "recommendForTask", { enumerable: true, get: func
 Object.defineProperty(exports, "extractQueryFeatures", { enumerable: true, get: function () { return advancedRouter_1.extractQueryFeatures; } });
 Object.defineProperty(exports, "updateModelProfile", { enumerable: true, get: function () { return advancedRouter_1.updateModelProfile; } });
 Object.defineProperty(exports, "MODEL_PROFILES", { enumerable: true, get: function () { return advancedRouter_1.MODEL_PROFILES; } });
+Object.defineProperty(exports, "QueryFeatures", { enumerable: true, get: function () { return advancedRouter_1.QueryFeatures; } });
+Object.defineProperty(exports, "ModelProfileType", { enumerable: true, get: function () { return advancedRouter_1.ModelProfile; } });
+Object.defineProperty(exports, "RouteDecision", { enumerable: true, get: function () { return advancedRouter_1.RouteDecision; } });
 const prefixCache_1 = require("./cache/prefixCache");
 Object.defineProperty(exports, "PrefixCache", { enumerable: true, get: function () { return prefixCache_1.PrefixCache; } });
 Object.defineProperty(exports, "createWarmedCache", { enumerable: true, get: function () { return prefixCache_1.createWarmedCache; } });
+Object.defineProperty(exports, "PrefixCacheStats", { enumerable: true, get: function () { return prefixCache_1.PrefixCacheStats; } });
 const speculativeDecoding_1 = require("./utils/speculativeDecoding");
 Object.defineProperty(exports, "SpeculativeDecoder", { enumerable: true, get: function () { return speculativeDecoding_1.SpeculativeDecoder; } });
 Object.defineProperty(exports, "speculativeBatch", { enumerable: true, get: function () { return speculativeDecoding_1.speculativeBatch; } });
 Object.defineProperty(exports, "estimateSpeedupPotential", { enumerable: true, get: function () { return speculativeDecoding_1.estimateSpeedupPotential; } });
 Object.defineProperty(exports, "MedusaPredictor", { enumerable: true, get: function () { return speculativeDecoding_1.MedusaPredictor; } });
 Object.defineProperty(exports, "EagleSpeculative", { enumerable: true, get: function () { return speculativeDecoding_1.EagleSpeculative; } });
+Object.defineProperty(exports, "SpeculativeConfig", { enumerable: true, get: function () { return speculativeDecoding_1.SpeculativeConfig; } });
+Object.defineProperty(exports, "SpeculativeResult", { enumerable: true, get: function () { return speculativeDecoding_1.SpeculativeResult; } });
+const ensembleVoting_1 = require("./routing/ensembleVoting");
+Object.defineProperty(exports, "executeEnsemble", { enumerable: true, get: function () { return ensembleVoting_1.executeEnsemble; } });
+Object.defineProperty(exports, "mergeComplementary", { enumerable: true, get: function () { return ensembleVoting_1.mergeComplementary; } });
+Object.defineProperty(exports, "recordFeedback", { enumerable: true, get: function () { return ensembleVoting_1.recordFeedback; } });
+const queryTypePresets_1 = require("./routing/queryTypePresets");
+Object.defineProperty(exports, "createPresetRouter", { enumerable: true, get: function () { return queryTypePresets_1.createPresetRouter; } });
+Object.defineProperty(exports, "getPresetForQuery", { enumerable: true, get: function () { return queryTypePresets_1.getPresetForQuery; } });
+Object.defineProperty(exports, "DEFAULT_PRESETS", { enumerable: true, get: function () { return queryTypePresets_1.DEFAULT_PRESETS; } });
 // PI Tool definitions (for PI agent integration)
 exports.TMLPD_PI_TOOLS = [
     {

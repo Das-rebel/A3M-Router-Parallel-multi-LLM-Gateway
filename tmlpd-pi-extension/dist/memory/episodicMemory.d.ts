@@ -39,7 +39,8 @@ export declare class EpisodicMemoryStore {
     private entries;
     private maxEntries;
     private keywordIndex;
-    constructor(maxEntries?: number);
+    private persistencePath;
+    constructor(maxEntries?: number, persistencePath?: string);
     /**
      * Store an episodic memory
      */
@@ -62,7 +63,23 @@ export declare class EpisodicMemoryStore {
         avg_duration_ms: number;
     };
     /**
-     * Clear all memories
+     * Persist current memory to disk as JSON
+     */
+    saveToDisk(): boolean;
+    /**
+     * Load memory from disk JSON
+     */
+    loadFromDisk(): boolean;
+    /**
+     * Rebuild keyword index from loaded entries
+     */
+    private rebuildIndex;
+    /**
+     * Auto-persist after adding new entries (if path configured)
+     */
+    private autoPersist;
+    /**
+     * Clear all memories (also removes persisted file)
      */
     clear(): void;
 }

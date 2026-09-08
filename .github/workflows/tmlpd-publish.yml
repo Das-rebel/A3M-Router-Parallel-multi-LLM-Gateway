@@ -1,0 +1,23 @@
+name: tmlpd-pi Publish
+
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  publish-tmlpd:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - name: Publish tmlpd-pi
+        working-directory: ./tmlpd-pi-extension
+        run: |
+          node -e "const p=require('./package.json'); console.log('Publishing tmlpd-pi@'+p.version)"
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
